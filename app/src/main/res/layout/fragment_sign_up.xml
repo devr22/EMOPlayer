@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center_horizontal"
+    android:orientation="vertical"
+    android:padding="20dp"
+    tools:context=".SignUp.SignUpFragment">
+
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/signUp_logo"
+        android:layout_width="110dp"
+        android:layout_height="110dp"
+        android:layout_marginTop="@dimen/spacing_xlarge"
+        android:scaleType="centerCrop"
+        android:src="@drawable/ic_launcher_background"
+        app:civ_border_color="#FFF"
+        app:civ_border_width="2dp" />
+
+    <View
+        android:layout_width="0dp"
+        android:layout_height="@dimen/spacing_mxlarge" />
+
+
+    <EditText
+        android:id="@+id/signUp_email"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/edit_text_background"
+        android:drawableStart="@drawable/ic_person_outline"
+        android:drawablePadding="5dp"
+        android:ems="10"
+        android:hint="@string/email"
+        android:inputType="textEmailAddress"
+        android:padding="10dp"
+        android:textSize="24sp" />
+
+    <View
+        android:layout_width="0dp"
+        android:layout_height="@dimen/spacing_mlarge" />
+
+    <EditText
+        android:id="@+id/signUp_password"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/edit_text_background"
+        android:drawableStart="@drawable/ic_lock_outline"
+        android:drawableEnd="@drawable/ic_eye"
+        android:drawablePadding="5dp"
+        android:ems="10"
+        android:hint="@string/password"
+        android:inputType="textPassword"
+        android:padding="10dp"
+        android:textSize="24sp" />
+
+    <View
+        android:layout_width="0dp"
+        android:layout_height="@dimen/spacing_mlarge" />
+
+    <EditText
+        android:id="@+id/signUp_confirmPassword"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/edit_text_background"
+        android:drawableStart="@drawable/ic_lock_outline"
+        android:drawableEnd="@drawable/ic_eye"
+        android:drawablePadding="5dp"
+        android:ems="10"
+        android:hint="@string/confirm_password"
+        android:inputType="textPassword"
+        android:padding="10dp"
+        android:textSize="24sp" />
+
+    <View
+        android:layout_width="0dp"
+        android:layout_height="@dimen/spacing_mxlarge" />
+
+    <ImageButton
+        android:id="@+id/signIp_submit"
+        android:layout_width="70dp"
+        android:layout_height="70dp"
+        android:background="@drawable/button_background"
+        android:src="@drawable/ic_chevron_right_black_24dp" />
+
+
+</LinearLayout>

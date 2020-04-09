@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "960429620327",
+    "firebase_url": "https://emoplayer-b6c47.firebaseio.com",
+    "project_id": "emoplayer-b6c47",
+    "storage_bucket": "emoplayer-b6c47.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:960429620327:android:3d2a9302a33ae5b61928c2",
+        "android_client_info": {
+          "package_name": "com.example.emoplayer"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "960429620327-deecs45ui1l1orjjipb4hvm0sdhgv11t.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBe-AIkoP72HLQNvXCSG6HbEDAyagpJmCY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "960429620327-deecs45ui1l1orjjipb4hvm0sdhgv11t.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,0 +1,19 @@
+<resources>
+    <string name="app_name">EMOPlayer</string>
+    <string name="username_or_email">UserName or Email</string>
+    <string name="password">Password</string>
+    <string name="sign_in">SIGN IN</string>
+    <string name="email">Email</string>
+    <string name="forgot_password">Forgot Password?</string>
+    <string name="login">Login</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="confirm_password">Confirm Password</string>
+    <string name="username">UserName</string>
+    <string name="name">Name</string>
+    <string name="new_user_sign_up">New User? Sign Up</string>
+    <string name="home">Home</string>
+    <string name="favourites">Favourites</string>
+    <string name="profile">Profile</string>
+</resources>
