@@ -2,12 +2,12 @@ package com.example.emoplayer.Model;
 
 public class Model_Users {
 
-    String uid;
-    String email;
-    String userName;
-    String name;
-    String gender;
-    String country;
+    public String uid;
+    public String email;
+    public String userName;
+    public String name;
+    public String gender;
+    public String country;
 
     public Model_Users(){
 

@@ -157,7 +157,7 @@ public class UserDetailFragment extends Fragment {
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
-                        Log.d(TAG, "updateUserInfo: Error");
+                        Log.d(TAG, "updateUserInfo: Error " + e.getMessage());
                     }
                 });
 

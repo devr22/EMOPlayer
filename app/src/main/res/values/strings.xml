@@ -16,4 +16,10 @@
     <string name="home">Home</string>
     <string name="favourites">Favourites</string>
     <string name="profile">Profile</string>
+    <string name="ek_saathi_aur_bhi_tha">Ek saathi aur bhi tha</string>
+    <string name="sonu_nigam">Sonu Nigam</string>
+    <string name="happy">Happy</string>
+    <string name="recommended">Recommended</string>
+    <string name="your_emotion">Your Emotion</string>
+    <string name="d">D</string>
 </resources>

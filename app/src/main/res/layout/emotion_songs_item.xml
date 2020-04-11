@@ -6,6 +6,7 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="@drawable/gradient_background"
         android:padding="5dp">
 
         <ImageView
@@ -13,29 +14,31 @@
             android:layout_width="50dp"
             android:layout_height="50dp"
             android:layout_alignParentStart="true"
-            android:src="@drawable/photo_singer_female"/>
+            android:src="@drawable/photo_singer_female" />
 
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
+            android:layout_marginStart="10dp"
             android:layout_toEndOf="@+id/emotion_albumImage"
-            android:layout_marginStart="10dp">
+            android:orientation="vertical">
 
             <TextView
                 android:id="@+id/emotion_songTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Ek saathi aur bhi tha"
+                android:text="@string/ek_saathi_aur_bhi_tha"
+                android:textColor="#FFF"
                 android:textSize="18sp"
-                android:textStyle="bold"/>
+                android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/emotion_songArtist"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Sonu Nigam"
-                android:textSize="16sp"/>
+                android:text="@string/sonu_nigam"
+                android:textColor="#EAEAEA"
+                android:textSize="16sp" />
 
         </LinearLayout>
 
@@ -44,12 +47,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
-            android:src="@drawable/ic_favorite_border_pink"
+            android:layout_marginTop="10dp"
             android:layout_marginEnd="10dp"
-            android:layout_marginTop="10dp"/>
+            android:src="@drawable/ic_favorite_border_pink" />
 
     </RelativeLayout>
-
-
 
 </androidx.cardview.widget.CardView>

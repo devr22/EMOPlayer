@@ -157,7 +157,6 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
 
-
         // cancel button
         builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
             @Override
@@ -172,7 +171,7 @@ public class LoginActivity extends AppCompatActivity {
         builder.create().show();
     }
 
-    private void beginRecovery(String email){
+    private void beginRecovery(String email) {
 
         progressDialog.setMessage("Sending email...");
         progressDialog.show();
@@ -184,11 +183,10 @@ public class LoginActivity extends AppCompatActivity {
 
                 progressDialog.dismiss();
 
-                if (task.isSuccessful()){
+                if (task.isSuccessful()) {
 
                     Toast.makeText(LoginActivity.this, "Email sent for Password Recovery", Toast.LENGTH_SHORT).show();
-                }
-                else {
+                } else {
                     Toast.makeText(LoginActivity.this, "Failed...", Toast.LENGTH_SHORT).show();
                 }
 
