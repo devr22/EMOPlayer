@@ -1,6 +1,6 @@
 package com.example.emoplayer.Model;
 
-public class Model_Songs {
+public class Model_Songs_Emotion {
 
     String album_art;
     String artist;
@@ -9,11 +9,11 @@ public class Model_Songs {
     String songLink;
     String songTitle;
 
-    public Model_Songs(){
+    public Model_Songs_Emotion(){
 
     }
 
-    public Model_Songs(String album_art, String artist, String songCategory, String songDuration, String songLink, String songTitle) {
+    public Model_Songs_Emotion(String album_art, String artist, String songCategory, String songDuration, String songLink, String songTitle) {
         this.album_art = album_art;
         this.artist = artist;
         this.songCategory = songCategory;

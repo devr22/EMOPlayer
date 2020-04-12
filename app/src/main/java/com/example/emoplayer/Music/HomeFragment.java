@@ -6,6 +6,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Adapter;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
@@ -15,7 +16,9 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.emoplayer.Adapter.AdapterEmotionSong;
-import com.example.emoplayer.Model.Model_Songs;
+import com.example.emoplayer.Adapter.AdapterRecommendedSong;
+import com.example.emoplayer.Model.Model_Songs_Emotion;
+import com.example.emoplayer.Model.Model_Songs_Recommended;
 import com.example.emoplayer.Model.Model_Users;
 import com.example.emoplayer.R;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -30,6 +33,8 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 
 public class HomeFragment extends Fragment {
 
@@ -46,10 +51,13 @@ public class HomeFragment extends Fragment {
 
     private FirebaseUser user;
     private FirebaseFirestore databaseUser;
-    private FirebaseFirestore databaseSong;
+    private FirebaseFirestore databaseEmotionSong;
+    private FirebaseFirestore databaseRecommendedSong;
 
     private AdapterEmotionSong adapterEmotionSong;
-    private ArrayList<Model_Songs> songList = new ArrayList<>();
+    private ArrayList<Model_Songs_Emotion> songListEmotion = new ArrayList<>();
+    private AdapterRecommendedSong adapterRecommendedSong;
+    private ArrayList<Model_Songs_Recommended> songListRecommended = new ArrayList<>();
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -60,9 +68,11 @@ public class HomeFragment extends Fragment {
 
         user = FirebaseAuth.getInstance().getCurrentUser();
         databaseUser = FirebaseFirestore.getInstance();
-        databaseSong = FirebaseFirestore.getInstance();
+        databaseEmotionSong = FirebaseFirestore.getInstance();
+        databaseRecommendedSong = FirebaseFirestore.getInstance();
 
         getUserDetail();
+        getRecommendedSong();
 
         cameraButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -85,6 +95,9 @@ public class HomeFragment extends Fragment {
 
         emotion_recyclerView.setHasFixedSize(true);
         emotion_recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+
+        recommend_recyclerView.setHasFixedSize(true);
+        recommend_recyclerView.setLayoutManager(new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false));
 
     }
 
@@ -143,7 +156,7 @@ public class HomeFragment extends Fragment {
 
     private void getSongBasedOnYourEmotion() {
 
-        databaseSong.collection("Songs")
+        databaseEmotionSong.collection("Songs")
                 .whereEqualTo("songCategory", emotionTV.getText().toString())
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
@@ -151,13 +164,13 @@ public class HomeFragment extends Fragment {
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
 
                         if (task.isSuccessful()) {
-                            songList.clear();
+                            songListEmotion.clear();
                             for (QueryDocumentSnapshot document : task.getResult()) {
 
-                                Model_Songs model_song = document.toObject(Model_Songs.class);
-                                songList.add(model_song);
+                                Model_Songs_Emotion model_song = document.toObject(Model_Songs_Emotion.class);
+                                songListEmotion.add(model_song);
                             }
-                            adapterEmotionSong = new AdapterEmotionSong(getActivity(), songList);
+                            adapterEmotionSong = new AdapterEmotionSong(getActivity(), songListEmotion);
                             emotion_recyclerView.setAdapter(adapterEmotionSong);
 
                         } else {
@@ -171,6 +184,49 @@ public class HomeFragment extends Fragment {
             }
         });
 
+    }
+
+    private void getRecommendedSong() {
+
+        databaseRecommendedSong.collection("Songs").get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+
+                        if (task.isSuccessful()) {
+
+                            ArrayList<Model_Songs_Recommended> songList = new ArrayList<>();
+                            for (DocumentSnapshot document : task.getResult()) {
+                                Model_Songs_Recommended model_song = document.toObject(Model_Songs_Recommended.class);
+                                songList.add(model_song);
+                            }
+                            int songListSize = songList.size();
+
+                            for (int i = 0; i < songListSize; i++) {
+
+                                Model_Songs_Recommended randomSong = songList.get(new Random().nextInt(songListSize));
+                                if (!songListRecommended.contains(randomSong)) {
+                                    songListRecommended.add(randomSong);
+                                    if (songListRecommended.size() == songListSize) {
+                                        break;
+                                    }
+                                }
+                            }
+
+                            adapterRecommendedSong = new AdapterRecommendedSong(getActivity(), songListRecommended);
+                            recommend_recyclerView.setAdapter(adapterRecommendedSong);
+
+                        } else {
+                            Log.d(TAG, "getRecommendedSong: Error getting documents: " + task.getException());
+                        }
+
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Log.d(TAG, "getRecommendedSong: failed: " + e.getMessage());
+            }
+        });
     }
 
 }

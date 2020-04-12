@@ -1,48 +1,49 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="180dp"
-    android:layout_height="190dp"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="120dp"
+    android:layout_height="170dp"
+    android:layout_marginEnd="5dp"
     app:cardCornerRadius="3dp"
     app:cardElevation="4dp">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical"
         android:background="@drawable/gradient_background"
         android:gravity="center_horizontal"
+        android:orientation="vertical"
         android:padding="8dp">
 
         <ImageView
             android:id="@+id/recommend_albumImage"
-            android:layout_width="60dp"
-            android:layout_height="60dp"
-            android:src="@drawable/photo_singer_female"/>
+            android:layout_width="70dp"
+            android:layout_height="70dp"
+            android:src="@drawable/photo_singer_female" />
 
         <TextView
-            android:id="@+id/fav_songTitle"
+            android:id="@+id/recommend_songTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:gravity="center"
             android:maxWidth="130dp"
             android:singleLine="false"
-            android:gravity="center"
-            android:layout_marginTop="5dp"
             android:text="@string/ek_saathi_aur_bhi_tha"
             android:textColor="#FFF"
             android:textSize="18sp"
-            android:textStyle="bold"/>
+            android:textStyle="bold" />
 
         <TextView
-            android:id="@+id/fav_songArtist"
+            android:id="@+id/recommend_songArtist"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:gravity="center"
-            android:singleLine="false"
             android:maxWidth="130dp"
+            android:singleLine="false"
             android:text="Sonu Nigam, Arijit Singh, Neeti Mohan"
             android:textColor="#EAEAEA"
-            android:textSize="16sp"/>
+            android:textSize="16sp" />
 
     </LinearLayout>
 

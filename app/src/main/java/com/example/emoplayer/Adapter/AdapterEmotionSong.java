@@ -11,20 +11,20 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.emoplayer.Model.Model_Songs;
+import com.example.emoplayer.Model.Model_Songs_Emotion;
 import com.example.emoplayer.R;
 import com.squareup.picasso.Picasso;
 
-import java.util.List;
+import java.util.ArrayList;
 
 public class AdapterEmotionSong extends RecyclerView.Adapter<AdapterEmotionSong.MyHolder> {
 
     private static final String TAG = "AdapterEmotionSong";
 
     private Context context;
-    private List<Model_Songs> songList;
+    private ArrayList<Model_Songs_Emotion> songList;
 
-    public AdapterEmotionSong(Context context, List<Model_Songs> songList) {
+    public AdapterEmotionSong(Context context, ArrayList<Model_Songs_Emotion> songList) {
         this.context = context;
         this.songList = songList;
     }
@@ -62,12 +62,12 @@ public class AdapterEmotionSong extends RecyclerView.Adapter<AdapterEmotionSong.
     }
 
     // View Holder Class
-    class MyHolder extends RecyclerView.ViewHolder {
+    static class MyHolder extends RecyclerView.ViewHolder {
 
         ImageView artistImage, savedImageView;
         TextView songTitle, songArtist;
 
-        public MyHolder(@NonNull View itemView) {
+        MyHolder(@NonNull View itemView) {
             super(itemView);
 
             artistImage = itemView.findViewById(R.id.emotion_albumImage);
