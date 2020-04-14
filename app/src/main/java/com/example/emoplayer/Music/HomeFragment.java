@@ -1,6 +1,7 @@
 package com.example.emoplayer.Music;
 
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -79,6 +80,13 @@ public class HomeFragment extends Fragment {
             public void onClick(View view) {
                 getEmotion();
                 getSongBasedOnYourEmotion();
+            }
+        });
+
+        displayNameTV.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(getActivity(), SongPlayerActivity.class));
             }
         });
 

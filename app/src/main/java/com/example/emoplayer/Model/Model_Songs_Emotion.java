@@ -4,6 +4,7 @@ public class Model_Songs_Emotion {
 
     String album_art;
     String artist;
+    String id;
     String songCategory;
     String songDuration;
     String songLink;
@@ -13,9 +14,10 @@ public class Model_Songs_Emotion {
 
     }
 
-    public Model_Songs_Emotion(String album_art, String artist, String songCategory, String songDuration, String songLink, String songTitle) {
+    public Model_Songs_Emotion(String album_art, String artist, String id, String songCategory, String songDuration, String songLink, String songTitle) {
         this.album_art = album_art;
         this.artist = artist;
+        this.id = id;
         this.songCategory = songCategory;
         this.songDuration = songDuration;
         this.songLink = songLink;
@@ -68,5 +70,13 @@ public class Model_Songs_Emotion {
 
     public void setSongTitle(String songTitle) {
         this.songTitle = songTitle;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 }
