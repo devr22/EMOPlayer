@@ -1,6 +1,8 @@
 package com.example.emoplayer.Adapter;
 
 import android.content.Context;
+import android.content.Intent;
+import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,6 +16,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.emoplayer.Model.Model_Songs_Emotion;
 import com.example.emoplayer.Model.Model_Songs_Favourites;
+import com.example.emoplayer.Music.MusicPlayerActivity;
 import com.example.emoplayer.R;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -27,6 +30,9 @@ import java.util.ArrayList;
 public class AdapterEmotionSong extends RecyclerView.Adapter<AdapterEmotionSong.MyHolder> {
 
     private static final String TAG = "AdapterEmotionSong";
+    private static final String SONG_LIST = "songs";
+    private static final String SONG_POSITION = "position";
+
 
     private Context context;
     private ArrayList<Model_Songs_Emotion> songList;
@@ -84,7 +90,7 @@ public class AdapterEmotionSong extends RecyclerView.Adapter<AdapterEmotionSong.
                             @Override
                             public void onSuccess(Void aVoid) {
                                 Log.d(TAG, "saveSong: saved");
-                                holder.saveSong.setImageDrawable(ContextCompat.getDrawable(context,R.drawable.ic_favorite_pink));
+                                holder.saveSong.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_favorite_pink));
                             }
                         }).addOnFailureListener(new OnFailureListener() {
                     @Override
@@ -140,6 +146,19 @@ public class AdapterEmotionSong extends RecyclerView.Adapter<AdapterEmotionSong.
                     });
                 }
 */
+            }
+        });
+
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                Intent intent = new Intent(context, MusicPlayerActivity.class);
+                Bundle bundle = new Bundle();
+                bundle.putSerializable(SONG_LIST, songList);
+                intent.putExtras(bundle);
+                intent.putExtra(SONG_POSITION, position);
+                context.startActivity(intent);
             }
         });
 

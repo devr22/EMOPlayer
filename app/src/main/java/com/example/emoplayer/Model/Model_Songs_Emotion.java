@@ -1,6 +1,8 @@
 package com.example.emoplayer.Model;
 
-public class Model_Songs_Emotion {
+import java.io.Serializable;
+
+public class Model_Songs_Emotion implements Serializable {
 
     String album_art;
     String artist;

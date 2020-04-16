@@ -22,6 +22,7 @@ import com.example.emoplayer.Model.Model_Songs_Emotion;
 import com.example.emoplayer.Model.Model_Songs_Recommended;
 import com.example.emoplayer.Model.Model_Users;
 import com.example.emoplayer.R;
+import com.example.jean.jcplayer.view.JcPlayerView;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -86,7 +87,7 @@ public class HomeFragment extends Fragment {
         displayNameTV.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startActivity(new Intent(getActivity(), SongPlayerActivity.class));
+                startActivity(new Intent(getActivity(), MusicPlayerActivity.class));
             }
         });
 
