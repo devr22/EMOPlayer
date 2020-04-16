@@ -36,6 +36,7 @@ public class MusicPlayerActivity extends AppCompatActivity {
         initJcAudioPlayList();
 
         jcPlayerView.playAudio(jcAudios.get(songPosition));
+        jcPlayerView.createNotification(R.drawable.ic_launcher_background);
 
     }
 
