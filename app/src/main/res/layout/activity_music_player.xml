@@ -101,11 +101,31 @@
             android:layout_height="300dp"
             android:background="@drawable/bg_gradient_hard" />
 
-        <com.example.jean.jcplayer.view.JcPlayerView
-            android:id="@+id/musicPlayer_jcPlayer"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="#fff" />
+            android:background="@android:color/black">
+
+            <com.example.jean.jcplayer.view.JcPlayerView
+                android:id="@+id/musicPlayer_jcPlayer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:layout_marginEnd="10dp"
+                app:next_icon_color="#F44336"
+                app:pause_icon_color="#F44336"
+                app:play_icon_color="#F44336"
+                app:previous_icon_color="#F44336"
+                app:progress_color="#FFF"
+                app:random_icon_color="#FFF"
+                app:repeat_icon_color="#FFF"
+                app:repeat_one_icon_color="#FFF"
+                app:seek_bar_color="#FFF"
+                app:text_audio_current_duration_color="#F44336"
+                app:text_audio_duration_color="#F44336"
+                app:text_audio_title_color="@android:color/white" />
+
+        </LinearLayout>
 
     </LinearLayout>
 

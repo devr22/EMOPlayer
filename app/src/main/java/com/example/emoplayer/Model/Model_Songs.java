@@ -2,7 +2,7 @@ package com.example.emoplayer.Model;
 
 import java.io.Serializable;
 
-public class Model_Songs_Emotion implements Serializable {
+public class Model_Songs implements Serializable {
 
     String album_art;
     String artist;
@@ -12,11 +12,11 @@ public class Model_Songs_Emotion implements Serializable {
     String songLink;
     String songTitle;
 
-    public Model_Songs_Emotion(){
+    public Model_Songs() {
 
     }
 
-    public Model_Songs_Emotion(String album_art, String artist, String id, String songCategory, String songDuration, String songLink, String songTitle) {
+    public Model_Songs(String album_art, String artist, String id, String songCategory, String songDuration, String songLink, String songTitle) {
         this.album_art = album_art;
         this.artist = artist;
         this.id = id;
@@ -40,6 +40,14 @@ public class Model_Songs_Emotion implements Serializable {
 
     public void setArtist(String artist) {
         this.artist = artist;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     public String getSongCategory() {
@@ -72,13 +80,5 @@ public class Model_Songs_Emotion implements Serializable {
 
     public void setSongTitle(String songTitle) {
         this.songTitle = songTitle;
-    }
-
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
     }
 }

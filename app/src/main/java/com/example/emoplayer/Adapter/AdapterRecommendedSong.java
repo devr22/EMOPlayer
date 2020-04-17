@@ -1,6 +1,8 @@
 package com.example.emoplayer.Adapter;
 
 import android.content.Context;
+import android.content.Intent;
+import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,7 +13,8 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.emoplayer.Model.Model_Songs_Recommended;
+import com.example.emoplayer.Model.Model_Songs;
+import com.example.emoplayer.Music.MusicPlayerActivity;
 import com.example.emoplayer.R;
 import com.squareup.picasso.Picasso;
 
@@ -22,9 +25,9 @@ public class AdapterRecommendedSong extends RecyclerView.Adapter<AdapterRecommen
     private static final String TAG = "AdapterRecommendedSong";
 
     private Context context;
-    ArrayList<Model_Songs_Recommended> songList;
+    private ArrayList<Model_Songs> songList;
 
-    public AdapterRecommendedSong(Context context, ArrayList<Model_Songs_Recommended> songList) {
+    public AdapterRecommendedSong(Context context, ArrayList<Model_Songs> songList) {
         this.context = context;
         this.songList = songList;
     }
@@ -38,7 +41,7 @@ public class AdapterRecommendedSong extends RecyclerView.Adapter<AdapterRecommen
     }
 
     @Override
-    public void onBindViewHolder(@NonNull MyHolder holder, int position) {
+    public void onBindViewHolder(@NonNull MyHolder holder, final int position) {
 
         // get data
         String image = songList.get(position).getAlbum_art();
@@ -53,6 +56,20 @@ public class AdapterRecommendedSong extends RecyclerView.Adapter<AdapterRecommen
         } catch (Exception e) {
             Log.d(TAG, "onBindViewHolder: failed to load image... " + e.getMessage());
         }
+
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                Intent intent = new Intent(context, MusicPlayerActivity.class);
+                Bundle bundle = new Bundle();
+                bundle.putSerializable(String.valueOf(R.string.SONG_LIST), songList);
+                intent.putExtras(bundle);
+                intent.putExtra(String.valueOf(R.string.SONG_POSITION), position);
+                intent.putExtra(String.valueOf(R.string.SOURCE), String.valueOf(R.string.RECOMMENDED_SONGS));
+                context.startActivity(intent);
+            }
+        });
 
     }
 

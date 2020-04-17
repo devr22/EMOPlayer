@@ -22,4 +22,14 @@
     <string name="recommended">Recommended</string>
     <string name="your_emotion">Your Emotion</string>
     <string name="d">D</string>
+
+
+    <!--  static variables-->
+    <string name="SONG_LIST">songs</string>
+    <string name="SONG_POSITION">position</string>
+    <string name="SOURCE">source</string>
+    <string name="FAV_SONGS">favourites song</string>
+    <string name="EMOTION_SONGS">emotion songs</string>
+    <string name="RECOMMENDED_SONGS">recommended songs</string>
+
 </resources>

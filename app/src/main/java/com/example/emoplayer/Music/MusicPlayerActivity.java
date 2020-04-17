@@ -1,11 +1,13 @@
 package com.example.emoplayer.Music;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
 import android.os.Bundle;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.example.emoplayer.Model.Model_Songs_Emotion;
+import com.example.emoplayer.Model.Model_Songs;
 import com.example.emoplayer.R;
 import com.example.jean.jcplayer.model.JcAudio;
 import com.example.jean.jcplayer.view.JcPlayerView;
@@ -16,15 +18,17 @@ import java.util.ArrayList;
 public class MusicPlayerActivity extends AppCompatActivity {
 
     private static final String TAG = "MusicPlayerActivity";
-    public static final String SONG_LIST = "songs";
-    private static final String SONG_POSITION = "position";
 
     private CircularImageView song_image;
     private TextView tv_song_title, tv_song_artist;
     private JcPlayerView jcPlayerView;
 
     int songPosition;
-    ArrayList<Model_Songs_Emotion> songList;
+    String songSource;
+    ArrayList<Model_Songs> songList_emotion;
+    ArrayList<Model_Songs> songList_fav;
+    ArrayList<Model_Songs> songList_recommended;
+
     ArrayList<JcAudio> jcAudios = new ArrayList<>();
 
     @Override
@@ -51,15 +55,47 @@ public class MusicPlayerActivity extends AppCompatActivity {
     private void initJcAudioPlayList(){
 
         Bundle bundle = getIntent().getExtras();
-        songList = (ArrayList<Model_Songs_Emotion>) bundle.getSerializable(SONG_LIST);
-        songPosition = getIntent().getIntExtra(SONG_POSITION, 0);
+        songPosition = getIntent().getIntExtra(String.valueOf(R.string.SONG_POSITION), 0);
+        songSource = getIntent().getStringExtra(String.valueOf(R.string.SOURCE));
 
+        assert songSource != null;
+        if (songSource.equals(String.valueOf(R.string.EMOTION_SONGS))){
 
-        for (Model_Songs_Emotion song : songList){
-            jcAudios.add(JcAudio.createFromURL(song.getSongTitle(), song.getSongLink()));
+            songList_emotion = (ArrayList<Model_Songs>) bundle.getSerializable(String.valueOf(R.string.SONG_LIST));
+
+            for (Model_Songs song : songList_emotion){
+                jcAudios.add(JcAudio.createFromURL(song.getSongTitle(), song.getSongLink()));
+            }
         }
+        else if (songSource.equals(String.valueOf(R.string.RECOMMENDED_SONGS))){
+
+            songList_recommended = (ArrayList<Model_Songs>) bundle.getSerializable(String.valueOf(R.string.SONG_LIST));
+
+            for (Model_Songs song : songList_recommended){
+                jcAudios.add(JcAudio.createFromURL(song.getSongTitle(), song.getSongLink()));
+            }
+        }
+        else {
+            songList_fav = (ArrayList<Model_Songs>) bundle.getSerializable(String.valueOf(R.string.SONG_LIST));
+
+            for (Model_Songs song : songList_fav){
+                jcAudios.add(JcAudio.createFromURL(song.getSongTitle(), song.getSongLink()));
+            }
+        }
+
         jcPlayerView.initPlaylist(jcAudios, null);
 
     }
+
+    /*private void rotateImageAlbum() {
+        if (!mp.isPlaying()) return;
+        song_image.animate().setDuration(100).rotation(song_image.getRotation() + 2f).setListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                rotateImageAlbum();
+                super.onAnimationEnd(animation);
+            }
+        });
+    }*/
 
 }

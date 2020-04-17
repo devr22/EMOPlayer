@@ -38,7 +38,7 @@ public class SignUpFragment extends Fragment {
     private ImageButton submit;
     private EditText emailEt, passwordEt, confirmPasswordEt;
 
-    ProgressDialog progressDialog;
+    private ProgressDialog progressDialog;
 
     private FirebaseAuth mAuth;
     private FirebaseFirestore database;
@@ -60,7 +60,6 @@ public class SignUpFragment extends Fragment {
         confirmPasswordEt = view.findViewById(R.id.signUp_confirmPassword);
 
 
-
         submit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -71,39 +70,34 @@ public class SignUpFragment extends Fragment {
         return view;
     }
 
-    private void createAccount(){
+    private void createAccount() {
 
         String password = passwordEt.getText().toString().trim();
         String confirmPassword = confirmPasswordEt.getText().toString().trim();
 
         //password matching
-        if (password.equals(confirmPassword)){
+        if (password.equals(confirmPassword)) {
             beginRegistration();
-        }
-        else{
+        } else {
             confirmPasswordEt.setError("Entered text does not matches password field");
             confirmPasswordEt.setFocusable(true);
         }
 
     }
 
-    private void beginRegistration(){
+    private void beginRegistration() {
 
         String email = emailEt.getText().toString().trim();
         String password = passwordEt.getText().toString().trim();
 
         //validate
-        if (!Patterns.EMAIL_ADDRESS.matcher(email).matches())
-        {
+        if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
             emailEt.setError("Invalid Email");
             emailEt.setFocusable(true);
-        }
-        else if (password.length() < 6)
-        {
+        } else if (password.length() < 6) {
             passwordEt.setError("Password length can't be less than 6 characters");
             passwordEt.setFocusable(true);
-        }
-        else {
+        } else {
             registerUser(email, password);
         }
 
@@ -121,11 +115,9 @@ public class SignUpFragment extends Fragment {
 
                         if (task.isSuccessful()) {
 
-                            // Sign in success, dismiss dialog
                             Log.d(TAG, "registerUser:success");
                             progressDialog.dismiss();
                             FirebaseUser user = mAuth.getCurrentUser();
-
                             if (user != null) {
                                 Log.d(TAG, "registerUser: " + user.getUid());
                                 storeUserInfo(user);
@@ -133,27 +125,24 @@ public class SignUpFragment extends Fragment {
 
                             callUserDetailFragment();
 
-                        }
-                        else {
-                            // If sign in fails, display a message to the user.
+                        } else {
                             Log.d(TAG, "registerUser:failure", task.getException());
                             progressDialog.dismiss();
                             Toast.makeText(getActivity(), "Registration Failed!", Toast.LENGTH_SHORT).show();
                         }
                     }
                 }).addOnFailureListener(new OnFailureListener() {
-
             @Override
             public void onFailure(@NonNull Exception e) {
 
                 progressDialog.dismiss();
-                Toast.makeText(getActivity(), ""+e.getMessage(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(getActivity(), "" + e.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
 
     }
 
-    private void callUserDetailFragment(){
+    private void callUserDetailFragment() {
         UserDetailFragment userDetailFragment = new UserDetailFragment();
         FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
         fragmentTransaction.replace(R.id.registration_container, userDetailFragment, "");
@@ -161,7 +150,7 @@ public class SignUpFragment extends Fragment {
         fragmentTransaction.commit();
     }
 
-    private void storeUserInfo(FirebaseUser user){
+    private void storeUserInfo(FirebaseUser user) {
 
         String email = user.getEmail();
         String uid = user.getUid();

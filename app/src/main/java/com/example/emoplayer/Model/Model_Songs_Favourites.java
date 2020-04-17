@@ -2,31 +2,31 @@ package com.example.emoplayer.Model;
 
 public class Model_Songs_Favourites {
 
-    String docId;
-    String songId;
+    String docID;
+    String songID;
 
-    public Model_Songs_Favourites(){
+    public Model_Songs_Favourites() {
 
     }
 
-    public Model_Songs_Favourites(String docId, String songId) {
-        this.docId = docId;
-        this.songId = songId;
+    public Model_Songs_Favourites(String docID, String songID) {
+        this.docID = docID;
+        this.songID = songID;
     }
 
-    public String getDocId() {
-        return docId;
+    public String getDocID() {
+        return docID;
     }
 
-    public void setDocId(String docId) {
-        this.docId = docId;
+    public void setDocID(String docID) {
+        this.docID = docID;
     }
 
-    public String getSongId() {
-        return songId;
+    public String getSongID() {
+        return songID;
     }
 
-    public void setSongId(String songId) {
-        this.songId = songId;
+    public void setSongID(String songID) {
+        this.songID = songID;
     }
 }

@@ -7,7 +7,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Adapter;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
@@ -18,11 +17,10 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.emoplayer.Adapter.AdapterEmotionSong;
 import com.example.emoplayer.Adapter.AdapterRecommendedSong;
-import com.example.emoplayer.Model.Model_Songs_Emotion;
-import com.example.emoplayer.Model.Model_Songs_Recommended;
+import com.example.emoplayer.Model.Model_Songs;
+import com.example.emoplayer.Model.Model_Songs_Favourites;
 import com.example.emoplayer.Model.Model_Users;
 import com.example.emoplayer.R;
-import com.example.jean.jcplayer.view.JcPlayerView;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -35,7 +33,6 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Random;
 
 public class HomeFragment extends Fragment {
@@ -55,11 +52,12 @@ public class HomeFragment extends Fragment {
     private FirebaseFirestore databaseUser;
     private FirebaseFirestore databaseEmotionSong;
     private FirebaseFirestore databaseRecommendedSong;
+    private FirebaseFirestore databaseFavouritesSong;
 
     private AdapterEmotionSong adapterEmotionSong;
-    private ArrayList<Model_Songs_Emotion> songListEmotion = new ArrayList<>();
+    private ArrayList<Model_Songs> songListEmotion = new ArrayList<>();
     private AdapterRecommendedSong adapterRecommendedSong;
-    private ArrayList<Model_Songs_Recommended> songListRecommended = new ArrayList<>();
+    private ArrayList<Model_Songs> songListRecommended = new ArrayList<>();
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -72,6 +70,7 @@ public class HomeFragment extends Fragment {
         databaseUser = FirebaseFirestore.getInstance();
         databaseEmotionSong = FirebaseFirestore.getInstance();
         databaseRecommendedSong = FirebaseFirestore.getInstance();
+        databaseFavouritesSong = FirebaseFirestore.getInstance();
 
         getUserDetail();
         getRecommendedSong();
@@ -81,13 +80,6 @@ public class HomeFragment extends Fragment {
             public void onClick(View view) {
                 getEmotion();
                 getSongBasedOnYourEmotion();
-            }
-        });
-
-        displayNameTV.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                startActivity(new Intent(getActivity(), MusicPlayerActivity.class));
             }
         });
 
@@ -176,7 +168,7 @@ public class HomeFragment extends Fragment {
                             songListEmotion.clear();
                             for (QueryDocumentSnapshot document : task.getResult()) {
 
-                                Model_Songs_Emotion model_song = document.toObject(Model_Songs_Emotion.class);
+                                Model_Songs model_song = document.toObject(Model_Songs.class);
                                 songListEmotion.add(model_song);
                             }
                             adapterEmotionSong = new AdapterEmotionSong(getActivity(), songListEmotion);
@@ -204,16 +196,16 @@ public class HomeFragment extends Fragment {
 
                         if (task.isSuccessful()) {
 
-                            ArrayList<Model_Songs_Recommended> songList = new ArrayList<>();
+                            ArrayList<Model_Songs> songList = new ArrayList<>();
                             for (DocumentSnapshot document : task.getResult()) {
-                                Model_Songs_Recommended model_song = document.toObject(Model_Songs_Recommended.class);
+                                Model_Songs model_song = document.toObject(Model_Songs.class);
                                 songList.add(model_song);
                             }
                             int songListSize = songList.size();
 
                             for (int i = 0; i < songListSize; i++) {
 
-                                Model_Songs_Recommended randomSong = songList.get(new Random().nextInt(songListSize));
+                                Model_Songs randomSong = songList.get(new Random().nextInt(songListSize));
                                 if (!songListRecommended.contains(randomSong)) {
                                     songListRecommended.add(randomSong);
                                     if (songListRecommended.size() == songListSize) {
