@@ -31,5 +31,14 @@
     <string name="FAV_SONGS">favourites song</string>
     <string name="EMOTION_SONGS">emotion songs</string>
     <string name="RECOMMENDED_SONGS">recommended songs</string>
+    <string name="rahul_dev">Rahul Dev</string>
+    <string name="devrahul2215_gmail_com">devrahul2215@gmail.com</string>
+    <string name="india">India</string>
+    <string name="male">Male</string>
+    <string name="dev">Dev</string>
+    <string name="_2">2</string>
+    <string name="songs">Songs</string>
+    <string name="unknown">Unknown</string>
+    <string name="logout">LOGOUT</string>
 
 </resources>

@@ -52,7 +52,6 @@ public class HomeFragment extends Fragment {
     private FirebaseFirestore databaseUser;
     private FirebaseFirestore databaseEmotionSong;
     private FirebaseFirestore databaseRecommendedSong;
-    private FirebaseFirestore databaseFavouritesSong;
 
     private AdapterEmotionSong adapterEmotionSong;
     private ArrayList<Model_Songs> songListEmotion = new ArrayList<>();
@@ -70,7 +69,6 @@ public class HomeFragment extends Fragment {
         databaseUser = FirebaseFirestore.getInstance();
         databaseEmotionSong = FirebaseFirestore.getInstance();
         databaseRecommendedSong = FirebaseFirestore.getInstance();
-        databaseFavouritesSong = FirebaseFirestore.getInstance();
 
         getUserDetail();
         getRecommendedSong();

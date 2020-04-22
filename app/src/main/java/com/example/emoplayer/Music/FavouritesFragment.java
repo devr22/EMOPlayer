@@ -34,6 +34,8 @@ import java.util.Objects;
 
 public class FavouritesFragment extends Fragment {
 
+    public static final String fav = "Favourites";
+
     private static final String TAG = "FavouritesFragment";
 
     public FavouritesFragment() {
@@ -77,7 +79,7 @@ public class FavouritesFragment extends Fragment {
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
 
                         if (task.isSuccessful()){
-                            Log.d(TAG, "getFavouriteSongIdList: Successful");
+
                             songIdList.clear();
                             for (QueryDocumentSnapshot document : task.getResult()){
 
@@ -85,7 +87,6 @@ public class FavouritesFragment extends Fragment {
                                 songIdList.add(fav_song);
                                 Log.d(TAG, "getFavouriteSongIdList: data: " + fav_song.getDocID());
                             }
-                            Log.d(TAG, "getFavouriteSongIdList: " + songIdList.size());
                             getFavouriteSongList(songIdList);
                         }
                         else {
@@ -103,12 +104,12 @@ public class FavouritesFragment extends Fragment {
 
     private void getFavouriteSongList(ArrayList<Model_Songs_Favourites> songIdList){
 
-        Log.d(TAG, "getFavouriteSongList: " + songIdList.size());
-
         songList.clear();
         for (Model_Songs_Favourites fav_song : songIdList){
 
-            databaseSongs.collection("Songs").document(fav_song.getSongID()).get()
+            String id= fav_song.getSongID().trim();
+
+            databaseSongs.collection("Songs").document(id).get()
                     .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
                         @Override
                         public void onSuccess(DocumentSnapshot documentSnapshot) {
@@ -116,14 +117,14 @@ public class FavouritesFragment extends Fragment {
                             Log.d(TAG, "getFavouriteSongList: onSuccess");
 
                             if (documentSnapshot.exists()){
-                                Model_Songs song = (Model_Songs) documentSnapshot.getData();
+                                Model_Songs song = documentSnapshot.toObject(Model_Songs.class);
                                 songList.add(song);
 
                                 adapterFavouritesSong = new AdapterFavouritesSong(getActivity(), songList);
                                 recyclerView.setAdapter(adapterFavouritesSong);
                             }
                             else {
-                                Log.d(TAG, "getFavouriteSongList: document does not exist");
+                                Log.d(TAG, "getFavouriteSongList: document does not exist: ");
                             }
 
                         }

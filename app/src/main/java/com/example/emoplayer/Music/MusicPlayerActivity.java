@@ -9,13 +9,15 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.emoplayer.Model.Model_Songs;
 import com.example.emoplayer.R;
+import com.example.jean.jcplayer.JcPlayerManagerListener;
+import com.example.jean.jcplayer.general.JcStatus;
 import com.example.jean.jcplayer.model.JcAudio;
 import com.example.jean.jcplayer.view.JcPlayerView;
 import com.mikhaellopez.circularimageview.CircularImageView;
 
 import java.util.ArrayList;
 
-public class MusicPlayerActivity extends AppCompatActivity {
+public class MusicPlayerActivity extends AppCompatActivity implements JcPlayerManagerListener {
 
     private static final String TAG = "MusicPlayerActivity";
 
@@ -31,6 +33,7 @@ public class MusicPlayerActivity extends AppCompatActivity {
 
     ArrayList<JcAudio> jcAudios = new ArrayList<>();
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -40,7 +43,8 @@ public class MusicPlayerActivity extends AppCompatActivity {
         initJcAudioPlayList();
 
         jcPlayerView.playAudio(jcAudios.get(songPosition));
-        jcPlayerView.createNotification(R.drawable.ic_launcher_background);
+        jcPlayerView.createNotification();
+
 
     }
 
@@ -87,8 +91,10 @@ public class MusicPlayerActivity extends AppCompatActivity {
 
     }
 
-    /*private void rotateImageAlbum() {
-        if (!mp.isPlaying()) return;
+    private void rotateImageAlbum() {
+
+        /*if (!shouldRotateImage)
+            return;*/
         song_image.animate().setDuration(100).rotation(song_image.getRotation() + 2f).setListener(new AnimatorListenerAdapter() {
             @Override
             public void onAnimationEnd(Animator animation) {
@@ -96,6 +102,45 @@ public class MusicPlayerActivity extends AppCompatActivity {
                 super.onAnimationEnd(animation);
             }
         });
-    }*/
+    }
 
+    @Override
+    public void onCompletedAudio() {
+
+    }
+
+    @Override
+    public void onContinueAudio(JcStatus jcStatus) {
+
+    }
+
+    @Override
+    public void onJcpError(Throwable throwable) {
+
+    }
+
+    @Override
+    public void onPaused(JcStatus jcStatus) {
+
+    }
+
+    @Override
+    public void onPlaying(JcStatus jcStatus) {
+
+    }
+
+    @Override
+    public void onPreparedAudio(JcStatus jcStatus) {
+        
+    }
+
+    @Override
+    public void onStopped(JcStatus jcStatus) {
+
+    }
+
+    @Override
+    public void onTimeChanged(JcStatus jcStatus) {
+
+    }
 }
