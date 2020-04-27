@@ -13,6 +13,7 @@ import com.example.emoplayer.Login.LoginActivity;
 import com.example.emoplayer.Music.SongsActivity;
 import com.example.emoplayer.SignUp.RegistrationActivity;
 import com.example.emoplayer.SignUp.SignUpFragment;
+import com.example.emoplayer.Utils.AppPermission;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
@@ -26,12 +27,21 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         firebaseAuth = FirebaseAuth.getInstance();
+        getAppPermission();
     }
 
     @Override
     protected void onStart() {
         checkUserStatus();
         super.onStart();
+    }
+
+    private void getAppPermission(){
+
+        AppPermission appPermission = new AppPermission(this);
+        if (!appPermission.checkCameraPermission()){
+            appPermission.requestCameraPermission();
+        }
     }
 
     private void checkUserStatus() {

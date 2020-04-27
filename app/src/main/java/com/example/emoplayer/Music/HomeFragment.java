@@ -1,16 +1,22 @@
 package com.example.emoplayer.Music;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Intent;
+import android.content.res.AssetFileDescriptor;
+import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -18,9 +24,9 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.emoplayer.Adapter.AdapterEmotionSong;
 import com.example.emoplayer.Adapter.AdapterRecommendedSong;
 import com.example.emoplayer.Model.Model_Songs;
-import com.example.emoplayer.Model.Model_Songs_Favourites;
 import com.example.emoplayer.Model.Model_Users;
 import com.example.emoplayer.R;
+import com.example.emoplayer.Utils.AppPermission;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -32,12 +38,22 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
+import org.tensorflow.lite.Interpreter;
+
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.nio.MappedByteBuffer;
+import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.Random;
+
+import static android.app.Activity.RESULT_OK;
 
 public class HomeFragment extends Fragment {
 
     private static final String TAG = "HomeFragment";
+    private static final String MODEL_PATH = "converted_model.tflite";
+    private static final int IMAGE_PICK_CAMERA_CODE = 100;
 
     public HomeFragment() {
     }
@@ -52,6 +68,8 @@ public class HomeFragment extends Fragment {
     private FirebaseFirestore databaseUser;
     private FirebaseFirestore databaseEmotionSong;
     private FirebaseFirestore databaseRecommendedSong;
+
+    private Interpreter tfLite;
 
     private AdapterEmotionSong adapterEmotionSong;
     private ArrayList<Model_Songs> songListEmotion = new ArrayList<>();
@@ -70,14 +88,19 @@ public class HomeFragment extends Fragment {
         databaseEmotionSong = FirebaseFirestore.getInstance();
         databaseRecommendedSong = FirebaseFirestore.getInstance();
 
+        try {
+            tfLite = new Interpreter(loadModelFile(getActivity()));
+        } catch (Exception e) {
+            Log.d(TAG, "onCreateView: " + e.getMessage());
+        }
+
         getUserDetail();
         getRecommendedSong();
 
         cameraButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                getEmotion();
-                getSongBasedOnYourEmotion();
+                getPicFromCamera();
             }
         });
 
@@ -137,10 +160,42 @@ public class HomeFragment extends Fragment {
         }
 
         c = model_users.getUserName().charAt(0);
-        display = Character.toString(c);
+        display = Character.toString(c).toUpperCase();
 
         displayNameTV.setText(display);
 
+    }
+
+    private void getPicFromCamera() {
+
+        AppPermission appPermission = new AppPermission(getActivity());
+        if (!appPermission.checkCameraPermission()) {
+            appPermission.requestCameraPermission();
+        }
+
+        try {
+            Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+            intent.putExtra("android.intent.extras.CAMERA_FACING", 1);
+            intent.putExtra("android.intent.extra.quickCapture", true);
+            startActivityForResult(intent, IMAGE_PICK_CAMERA_CODE);
+
+        } catch (Exception e) {
+            Log.d(TAG, "getPicFromCamera: " + e.getMessage());
+        }
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (resultCode == RESULT_OK) {
+            if (requestCode == IMAGE_PICK_CAMERA_CODE) {
+
+                Bitmap bitmap = (Bitmap) data.getExtras().get("data");
+
+                Toast.makeText(getActivity(), "Clicked", Toast.LENGTH_SHORT).show();
+            }
+        }
     }
 
     @SuppressLint("SetTextI18n")
@@ -151,6 +206,7 @@ public class HomeFragment extends Fragment {
         } else {
             emotionTV.setText("Happy");
         }
+        getSongBasedOnYourEmotion();
     }
 
     private void getSongBasedOnYourEmotion() {
@@ -226,6 +282,18 @@ public class HomeFragment extends Fragment {
                 Log.d(TAG, "getRecommendedSong: failed: " + e.getMessage());
             }
         });
+    }
+
+    /**
+     * Memory-map the model file in Assets.
+     */
+    private MappedByteBuffer loadModelFile(Activity activity) throws IOException {
+        AssetFileDescriptor fileDescriptor = activity.getAssets().openFd(MODEL_PATH);
+        FileInputStream inputStream = new FileInputStream(fileDescriptor.getFileDescriptor());
+        FileChannel fileChannel = inputStream.getChannel();
+        long startOffset = fileDescriptor.getStartOffset();
+        long declaredLength = fileDescriptor.getDeclaredLength();
+        return fileChannel.map(FileChannel.MapMode.READ_ONLY, startOffset, declaredLength);
     }
 
 }
