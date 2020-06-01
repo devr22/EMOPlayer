@@ -1,21 +1,25 @@
 package com.example.emoplayer.Model;
 
-public class Model_Songs_Recommended {
+import java.io.Serializable;
+
+public class Model_Songs implements Serializable {
 
     String album_art;
     String artist;
+    String id;
     String songCategory;
     String songDuration;
     String songLink;
     String songTitle;
 
-    public Model_Songs_Recommended(){
+    public Model_Songs() {
 
     }
 
-    public Model_Songs_Recommended(String album_art, String artist, String songCategory, String songDuration, String songLink, String songTitle) {
+    public Model_Songs(String album_art, String artist, String id, String songCategory, String songDuration, String songLink, String songTitle) {
         this.album_art = album_art;
         this.artist = artist;
+        this.id = id;
         this.songCategory = songCategory;
         this.songDuration = songDuration;
         this.songLink = songLink;
@@ -36,6 +40,14 @@ public class Model_Songs_Recommended {
 
     public void setArtist(String artist) {
         this.artist = artist;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     public String getSongCategory() {
