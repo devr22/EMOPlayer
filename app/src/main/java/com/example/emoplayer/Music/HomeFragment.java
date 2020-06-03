@@ -55,6 +55,8 @@ public class HomeFragment extends Fragment {
     private static final String MODEL_PATH = "converted_model.tflite";
     private static final int IMAGE_PICK_CAMERA_CODE = 100;
 
+    public static Bitmap bitmap;
+
     public HomeFragment() {
     }
 
@@ -191,7 +193,7 @@ public class HomeFragment extends Fragment {
         if (resultCode == RESULT_OK) {
             if (requestCode == IMAGE_PICK_CAMERA_CODE) {
 
-                Bitmap bitmap = (Bitmap) data.getExtras().get("data");
+                 bitmap = (Bitmap) data.getExtras().get("data");
 
                 Toast.makeText(getActivity(), "Clicked", Toast.LENGTH_SHORT).show();
             }
