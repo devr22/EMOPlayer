@@ -4,13 +4,13 @@ import java.io.Serializable;
 
 public class Model_Songs implements Serializable {
 
-    String album_art;
-    String artist;
-    String id;
-    String songCategory;
-    String songDuration;
-    String songLink;
-    String songTitle;
+    private String album_art;
+    private String artist;
+    private String id;
+    private String songCategory;
+    private String songDuration;
+    private String songLink;
+    private String songTitle;
 
     public Model_Songs() {
 
