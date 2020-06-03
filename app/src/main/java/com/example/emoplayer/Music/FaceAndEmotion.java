@@ -78,6 +78,7 @@ public class FaceAndEmotion extends HomeFragment {
 
     public static Bitmap croppedBmp;
     public static String emotion;
+    public static Rect bounds;
     public static List<String> label = Arrays.asList("angry" ,"disgust","scared", "happy", "sad", "surprised",
             "neutral");
     // Face Model
@@ -108,8 +109,11 @@ public class FaceAndEmotion extends HomeFragment {
                         .addOnSuccessListener(
                                 new OnSuccessListener<List<FirebaseVisionFace>>() {
                                     @Override
-                                    public void onSuccess(List<FirebaseVisionFace> face) {
+                                    public void onSuccess(List<FirebaseVisionFace> faces) {
                                         // Task completed successfully
+                                        for (FirebaseVisionFace face : faces) {
+                                            bounds = face.getBoundingBox();
+                                        }
                                         // ...
                                     }
                                 })
@@ -121,8 +125,6 @@ public class FaceAndEmotion extends HomeFragment {
                                         // ...
                                     }
                                 });
-
-            Rect bounds = face.getBoundingBox();
 
             croppedBmp = Bitmap.createBitmap(bitmap, bounds.left, bounds.top, bounds.right, bounds.bottom);
 
