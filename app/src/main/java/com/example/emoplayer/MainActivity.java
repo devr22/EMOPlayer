@@ -36,10 +36,10 @@ public class MainActivity extends AppCompatActivity {
         super.onStart();
     }
 
-    private void getAppPermission(){
+    private void getAppPermission() {
 
         AppPermission appPermission = new AppPermission(this);
-        if (!appPermission.checkCameraPermission()){
+        if (!appPermission.checkCameraPermission()) {
             appPermission.requestCameraPermission();
         }
     }
@@ -49,11 +49,9 @@ public class MainActivity extends AppCompatActivity {
         FirebaseUser user = firebaseAuth.getCurrentUser();
         if (user != null) {
             startActivity(new Intent(MainActivity.this, SongsActivity.class));
-            finish();
-        }
-        else {
+        } else {
             startActivity(new Intent(MainActivity.this, LoginActivity.class));
-            finish();
         }
+        finish();
     }
 }
