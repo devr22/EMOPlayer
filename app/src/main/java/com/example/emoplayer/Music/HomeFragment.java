@@ -37,6 +37,7 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.ml.common.FirebaseMLException;
 
 import org.tensorflow.lite.Interpreter;
 
@@ -55,10 +56,11 @@ public class HomeFragment extends Fragment {
     private static final String MODEL_PATH = "converted_model.tflite";
     private static final int IMAGE_PICK_CAMERA_CODE = 100;
 
-    public static Bitmap bitmap;
-
     public HomeFragment() {
     }
+
+    public static Bitmap bitmap;
+    private String myEmotion = null;
 
     private TextView emotionTV;
     private TextView displayNameTV;
@@ -70,8 +72,6 @@ public class HomeFragment extends Fragment {
     private FirebaseFirestore databaseUser;
     private FirebaseFirestore databaseEmotionSong;
     private FirebaseFirestore databaseRecommendedSong;
-
-    private Interpreter tfLite;
 
     private AdapterEmotionSong adapterEmotionSong;
     private ArrayList<Model_Songs> songListEmotion = new ArrayList<>();
@@ -91,7 +91,7 @@ public class HomeFragment extends Fragment {
         databaseRecommendedSong = FirebaseFirestore.getInstance();
 
         try {
-            tfLite = new Interpreter(loadModelFile(getActivity()));
+            Interpreter tfLite = new Interpreter(loadModelFile(getActivity()));
         } catch (Exception e) {
             Log.d(TAG, "onCreateView: " + e.getMessage());
         }
@@ -193,7 +193,26 @@ public class HomeFragment extends Fragment {
         if (resultCode == RESULT_OK) {
             if (requestCode == IMAGE_PICK_CAMERA_CODE) {
 
-                 bitmap = (Bitmap) data.getExtras().get("data");
+                bitmap = (Bitmap) data.getExtras().get("data");
+                /*FaceAndEmotion faceAndEmotion = new FaceAndEmotion();
+                try {
+                    faceAndEmotion.runInference();
+                } catch (FirebaseMLException e) {
+                    Log.d(TAG, "onActivityResult: exception: " + e.getMessage());
+                }
+                myEmotion = faceAndEmotion.emotion;*/
+
+                FaceAndEmotion1 faceAndEmotion1 = new FaceAndEmotion1();
+                try {
+                    myEmotion = faceAndEmotion1.runModel(bitmap);
+                    Log.d(TAG, "onActivityResult: Emotion: " + myEmotion);
+                } catch (FirebaseMLException e) {
+                    e.printStackTrace();
+                }
+
+                if (myEmotion != null){
+                    getEmotion();
+                }
 
                 Toast.makeText(getActivity(), "Clicked", Toast.LENGTH_SHORT).show();
             }
@@ -203,11 +222,14 @@ public class HomeFragment extends Fragment {
     @SuppressLint("SetTextI18n")
     private void getEmotion() {
 
-        if (emotionTV.getText().equals("Happy")) {
+        /*if (emotionTV.getText().equals("Happy")) {
             emotionTV.setText("Sad");
         } else {
             emotionTV.setText("Happy");
-        }
+        }*/
+
+        myEmotion = myEmotion.substring(0, 1).toUpperCase() + myEmotion.substring(1);
+        emotionTV.setText(myEmotion);
         getSongBasedOnYourEmotion();
     }
 

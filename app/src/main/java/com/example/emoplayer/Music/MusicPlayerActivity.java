@@ -3,8 +3,10 @@ package com.example.emoplayer.Music;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.emoplayer.Model.Model_Songs;
@@ -13,7 +15,12 @@ import com.example.jean.jcplayer.JcPlayerManagerListener;
 import com.example.jean.jcplayer.general.JcStatus;
 import com.example.jean.jcplayer.model.JcAudio;
 import com.example.jean.jcplayer.view.JcPlayerView;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.mikhaellopez.circularimageview.CircularImageView;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 
@@ -30,14 +37,16 @@ public class MusicPlayerActivity extends AppCompatActivity implements JcPlayerMa
     ArrayList<Model_Songs> songList_emotion;
     ArrayList<Model_Songs> songList_fav;
     ArrayList<Model_Songs> songList_recommended;
-
     ArrayList<JcAudio> jcAudios = new ArrayList<>();
 
+    FirebaseFirestore database;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_music_player);
+
+        database = FirebaseFirestore.getInstance();
 
         initViews();
         initJcAudioPlayList();
@@ -105,6 +114,11 @@ public class MusicPlayerActivity extends AppCompatActivity implements JcPlayerMa
     }
 
     @Override
+    protected void onDestroy() {
+        super.onDestroy();
+    }
+
+    @Override
     public void onCompletedAudio() {
 
     }
@@ -126,7 +140,8 @@ public class MusicPlayerActivity extends AppCompatActivity implements JcPlayerMa
 
     @Override
     public void onPlaying(JcStatus jcStatus) {
-
+        String songTitle = jcStatus.getJcAudio().getTitle();
+        replaceSongIconImage(songTitle);
     }
 
     @Override
@@ -143,4 +158,34 @@ public class MusicPlayerActivity extends AppCompatActivity implements JcPlayerMa
     public void onTimeChanged(JcStatus jcStatus) {
 
     }
+
+    private void replaceSongIconImage(String title){
+
+        database.collection("Songs").whereEqualTo("songTitle", title).get()
+                .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                    @Override
+                    public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+
+                        Log.d(TAG, "replaceSongIconImage: success");
+
+                        Model_Songs model_songs = (Model_Songs) queryDocumentSnapshots.toObjects(Model_Songs.class);
+
+                        tv_song_title.setText(model_songs.getSongTitle());
+                        tv_song_artist.setText(model_songs.getArtist());
+                        try {
+                            Picasso.get().load(model_songs.getAlbum_art())
+                                    .placeholder(R.drawable.photo_singer_female).into(song_image);
+                        } catch (Exception e) {
+                            Log.d(TAG, "onBindViewHolder: failed to load image... " + e.getMessage());
+                        }
+
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Log.d(TAG, "replaceSongIconImage: failed" + e.getMessage());
+            }
+        });
+    }
+
 }

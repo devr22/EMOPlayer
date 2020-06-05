@@ -75,7 +75,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/spacing_middle"
-            android:text="Day Of The Dispair"
+            android:text=""
             android:textAppearance="@style/TextAppearance.AppCompat.Large"
             android:textColor="@android:color/white" />
 
@@ -84,7 +84,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/spacing_medium"
-            android:text="The Beat"
+            android:text=""
             android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
             android:textColor="#999999" />
 

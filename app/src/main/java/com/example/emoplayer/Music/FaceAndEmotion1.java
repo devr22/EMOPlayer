@@ -26,108 +26,37 @@ import com.google.firebase.ml.vision.face.FirebaseVisionFaceDetectorOptions;
 import java.util.Arrays;
 import java.util.List;
 
+public class FaceAndEmotion1 {
 
-public class FaceAndEmotion extends HomeFragment {
-
-    private static final String TAG = "FaceAndEmotion";
+    private static final String TAG = "FaceAndEmotion1";
 
     FirebaseCustomLocalModel localModel;
     FirebaseModelInterpreter firebaseInterpreter;
     FirebaseModelInputOutputOptions inputOutputOptions;
 
-    public static Bitmap croppedBmp;
-    public String emotion;
+    private Bitmap croppedBmp;
+    public String emotion = null;
     public static Rect bounds;
     public static List<String> label = Arrays.asList("angry", "disgust", "scared", "happy", "sad", "surprised", "neutral");
 
-    public FaceAndEmotion() {
-//        imageFromBitmap();
-//        configureLocalModelSource();
-
+    public FaceAndEmotion1(){
         localModel = new FirebaseCustomLocalModel.Builder().setAssetFilePath("converted_model.tflite").build();
         try {
-            firebaseInterpreter = createInterpreter(localModel);
+            firebaseInterpreter = createInterpreter();
         } catch (FirebaseMLException e) {
-            e.printStackTrace();
+            Log.d(TAG, "FaceAndEmotion1: Interpreter exception: " + e.getMessage());
         }
         try {
             inputOutputOptions = createInputOutputOptions();
         } catch (FirebaseMLException e) {
-            e.printStackTrace();
+            Log.d(TAG, "FaceAndEmotion1: Input output exception: " + e.getMessage());
         }
-
-        imageFromBitmap();
     }
 
-    // Face Model
-    private void imageFromBitmap() {
-        FirebaseVisionImage image = FirebaseVisionImage.fromBitmap(bitmap);
-        detectFaces(image);
-    }
+    private FirebaseModelInterpreter createInterpreter() throws FirebaseMLException {
 
-    private void detectFaces(FirebaseVisionImage image) {
-        // [START set_detector_options]
-        FirebaseVisionFaceDetectorOptions options = new FirebaseVisionFaceDetectorOptions.Builder()
-                .setClassificationMode(FirebaseVisionFaceDetectorOptions.ACCURATE)
-                .setLandmarkMode(FirebaseVisionFaceDetectorOptions.ALL_LANDMARKS)
-                .setClassificationMode(FirebaseVisionFaceDetectorOptions.ALL_CLASSIFICATIONS)
-                .setPerformanceMode(FirebaseVisionFaceDetectorOptions.ACCURATE)
-                .setMinFaceSize(0.15f)
-                .enableTracking()
-                .build();
-
-
-        FirebaseVisionFaceDetector detector = FirebaseVision.getInstance()
-                .getVisionFaceDetector(options);
-
-        Task<List<FirebaseVisionFace>> result = detector.detectInImage(image)
-                .addOnSuccessListener(new OnSuccessListener<List<FirebaseVisionFace>>() {
-                    @Override
-                    public void onSuccess(List<FirebaseVisionFace> faces) {
-                        // Task completed successfully
-                        for (FirebaseVisionFace face : faces) {
-                            bounds = face.getBoundingBox();
-                            croppedBmp = Bitmap.createBitmap(bitmap, bounds.left, bounds.top, bounds.right, bounds.bottom);
-                        }
-                        // ...
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        // Task failed with an exception
-                        Log.d(TAG, "detectFaces: Failed: " + e.getMessage());
-                        // ...
-                    }
-                });
-
-//        croppedBmp = Bitmap.createBitmap(bitmap, bounds.left, bounds.top, bounds.right, bounds.bottom);
-
-    }
-
-    public Bitmap getImage() {
-        return croppedBmp;
-    }
-
-    // Emotion Model
-    private void configureLocalModelSource() {
-        FirebaseCustomLocalModel localModel = new FirebaseCustomLocalModel.Builder()
-                .setAssetFilePath("converted_model.tflite")
-                .build();
-
-    }
-
-
-    private FirebaseModelInterpreter createInterpreter(FirebaseCustomLocalModel localModel) throws FirebaseMLException {
-
-        FirebaseModelInterpreter interpreter = null;
-        try {
-            FirebaseModelInterpreterOptions options = new FirebaseModelInterpreterOptions.Builder(localModel).build();
-            interpreter = FirebaseModelInterpreter.getInstance(options);
-        } catch (FirebaseMLException e) {
-            // ...
-            Log.d(TAG, "createInterpreter: exception: " + e.getMessage());
-        }
+        FirebaseModelInterpreterOptions options = new FirebaseModelInterpreterOptions.Builder(localModel).build();
+        FirebaseModelInterpreter interpreter = FirebaseModelInterpreter.getInstance(options);
         return interpreter;
     }
 
@@ -140,35 +69,56 @@ public class FaceAndEmotion extends HomeFragment {
         return inputOutputOptions;
     }
 
-    private float[][][][] bitmapToInputArray() {
+    public String runModel(final Bitmap bitmap) throws FirebaseMLException{
 
-        Bitmap bitmap = getImage();
-        bitmap = Bitmap.createScaledBitmap(bitmap, 64, 64, true);
-        Bitmap bmpGrayscale = Bitmap.createBitmap(bitmap.getWidth(), bitmap.getHeight(), Bitmap.Config.ARGB_8888);
+        FirebaseVisionImage image = FirebaseVisionImage.fromBitmap(bitmap);
+
+        FirebaseVisionFaceDetectorOptions options = new FirebaseVisionFaceDetectorOptions.Builder()
+                .setClassificationMode(FirebaseVisionFaceDetectorOptions.ACCURATE)
+                .setLandmarkMode(FirebaseVisionFaceDetectorOptions.ALL_LANDMARKS)
+                .setClassificationMode(FirebaseVisionFaceDetectorOptions.ALL_CLASSIFICATIONS)
+                .setPerformanceMode(FirebaseVisionFaceDetectorOptions.ACCURATE)
+                .setMinFaceSize(0.15f)
+                .enableTracking()
+                .build();
+
+        FirebaseVisionFaceDetector detector = FirebaseVision.getInstance().getVisionFaceDetector(options);
+
+        Task<List<FirebaseVisionFace>> result = detector.detectInImage(image)
+                .addOnSuccessListener(new OnSuccessListener<List<FirebaseVisionFace>>() {
+                    @Override
+                    public void onSuccess(List<FirebaseVisionFace> faces) {
+                        // Task completed successfully
+                        for (FirebaseVisionFace face : faces) {
+                            Log.d(TAG, "runModel: Successful");
+                            bounds = face.getBoundingBox();
+                            croppedBmp = Bitmap.createBitmap(bitmap, bounds.left, bounds.top, bounds.right, bounds.bottom);
+                        }
+                        // ...
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        // Task failed with an exception
+                        Log.d(TAG, "runModel: Failed: " + e.getMessage());
+                        // ...
+                    }
+                });
+
+        Bitmap myBitmap = Bitmap.createScaledBitmap(croppedBmp, 64, 64, true);
+        Bitmap bmpGrayscale = Bitmap.createBitmap(myBitmap.getWidth(), myBitmap.getHeight(), Bitmap.Config.ARGB_8888);
         int batchNum = 0;
         float[][][][] input = new float[1][64][64][1];
         for (int x = 0; x < 64; x++) {
             for (int y = 0; y < 64; y++) {
                 int pixel = bmpGrayscale.getPixel(x, y);
-                // Normalize channel values to [-1.0, 1.0]. This requirement varies by
-                // model. For example, some models might require values to be normalized
-                // to the range [0.0, 1.0] instead.
                 input[batchNum][x][y][0] = (pixel - 127) / 128.0f;
             }
         }
-        return input;
-    }
-
-    public void runInference() throws FirebaseMLException {
-//        FirebaseCustomLocalModel localModel = new FirebaseCustomLocalModel.Builder().setAssetFilePath("converted_model.tflite").build();
-//        FirebaseModelInterpreter firebaseInterpreter = createInterpreter(localModel);
-//        imageFromBitmap();
-        float[][][][] input = bitmapToInputArray();
-//        FirebaseModelInputOutputOptions inputOutputOptions = createInputOutputOptions();
-
 
         FirebaseModelInputs inputs = new FirebaseModelInputs.Builder()
-                .add(input)  // add() as many input arrays as your model requires
+                .add(input)
                 .build();
 
         firebaseInterpreter.run(inputs, inputOutputOptions)
@@ -177,9 +127,10 @@ public class FaceAndEmotion extends HomeFragment {
                     public void onSuccess(FirebaseModelOutputs result) {
                         // [START_EXCLUDE]
                         // [START mlkit_read_result]
+                        Log.d(TAG,"runModel: interpreter run successful");
                         float[][] output = result.getOutput(0);
                         float[] probabilities = output[0];
-                        emotion = useInferenceResult(probabilities);
+                        emotion =  useInferenceResult(probabilities);
 
                     }
                 })
@@ -187,12 +138,13 @@ public class FaceAndEmotion extends HomeFragment {
                     @Override
                     public void onFailure(@NonNull Exception e) {
                         // Task failed with an exception
-                        Log.d(TAG, "runInference: failed : " + e.getMessage());
+                        Log.d(TAG, "runModel: interpreter failed : " + e.getMessage());
                         // ...
                     }
                 });
-    }
 
+        return emotion;
+    }
 
     public String useInferenceResult(float[] probabilities) {
 
@@ -202,5 +154,5 @@ public class FaceAndEmotion extends HomeFragment {
         }
         return label.get(max);
     }
-}
 
+}
