@@ -8,7 +8,6 @@ import androidx.annotation.NonNull;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.ml.common.FirebaseMLException;
 import com.google.firebase.ml.custom.FirebaseCustomLocalModel;
 import com.google.firebase.ml.custom.FirebaseModelDataType;
@@ -29,14 +28,17 @@ import java.util.List;
 public class FaceAndEmotion1 {
 
     private static final String TAG = "FaceAndEmotion1";
+    private static final int width = 64;
+    private static final int  height = 64;
 
     FirebaseCustomLocalModel localModel;
     FirebaseModelInterpreter firebaseInterpreter;
     FirebaseModelInputOutputOptions inputOutputOptions;
 
+    private Bitmap bmpGrayscale;
     private Bitmap croppedBmp;
     public String emotion = null;
-    public static Rect bounds;
+    public Rect bounds;
     public static List<String> label = Arrays.asList("angry", "disgust", "scared", "happy", "sad", "surprised", "neutral");
 
     public FaceAndEmotion1(){
@@ -84,7 +86,7 @@ public class FaceAndEmotion1 {
 
         FirebaseVisionFaceDetector detector = FirebaseVision.getInstance().getVisionFaceDetector(options);
 
-        Task<List<FirebaseVisionFace>> result = detector.detectInImage(image)
+        detector.detectInImage(image)
                 .addOnSuccessListener(new OnSuccessListener<List<FirebaseVisionFace>>() {
                     @Override
                     public void onSuccess(List<FirebaseVisionFace> faces) {
@@ -106,8 +108,17 @@ public class FaceAndEmotion1 {
                     }
                 });
 
-        Bitmap myBitmap = Bitmap.createScaledBitmap(croppedBmp, 64, 64, true);
-        Bitmap bmpGrayscale = Bitmap.createBitmap(myBitmap.getWidth(), myBitmap.getHeight(), Bitmap.Config.ARGB_8888);
+        croppedBmp = Bitmap.createBitmap(bitmap, bounds.left, bounds.top, bounds.right, bounds.bottom);
+
+        if (croppedBmp == null) {
+            Log.d(TAG, "runModel: croppedBmp is null");
+        }
+
+        Bitmap myBitmap = Bitmap.createScaledBitmap(croppedBmp, width, height, true);
+        if (myBitmap != null) {
+            Log.d(TAG, "runModel: myBitmap is not null");
+            bmpGrayscale = Bitmap.createBitmap(myBitmap.getWidth(), myBitmap.getHeight(), Bitmap.Config.ARGB_8888);
+        }
         int batchNum = 0;
         float[][][][] input = new float[1][64][64][1];
         for (int x = 0; x < 64; x++) {
