@@ -46,6 +46,8 @@ import java.io.IOException;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Random;
 
 import static android.app.Activity.RESULT_OK;
@@ -59,8 +61,11 @@ public class HomeFragment extends Fragment {
     public HomeFragment() {
     }
 
-    public static Bitmap bitmap;
-    private String myEmotion = null;
+    Interpreter tflite;
+
+    public Bitmap bitmap;
+    private String myEmotion;
+    public static List<String> label = Arrays.asList("angry", "disgust", "scared", "happy", "sad", "surprised", "neutral");
 
     private TextView emotionTV;
     private TextView displayNameTV;
@@ -91,9 +96,9 @@ public class HomeFragment extends Fragment {
         databaseRecommendedSong = FirebaseFirestore.getInstance();
 
         try {
-            Interpreter tfLite = new Interpreter(loadModelFile(getActivity()));
-        } catch (Exception e) {
-            Log.d(TAG, "onCreateView: " + e.getMessage());
+            tflite = new Interpreter(loadModelFile(getActivity()));
+        } catch (IOException e) {
+            e.printStackTrace();
         }
 
         getUserDetail();
@@ -194,6 +199,14 @@ public class HomeFragment extends Fragment {
             if (requestCode == IMAGE_PICK_CAMERA_CODE) {
 
                 bitmap = (Bitmap) data.getExtras().get("data");
+                //bitmap = Bitmap.createScaledBitmap(bitmap, bitmap.getWidth(), bitmap.getHeight(), false);
+
+                if (bitmap != null){
+                    Log.d(TAG, "onActivityResult: Image available");
+                }
+
+                //tflite.run(bitmap, label);
+
                 /*FaceAndEmotion faceAndEmotion = new FaceAndEmotion();
                 try {
                     faceAndEmotion.runInference();
@@ -204,7 +217,9 @@ public class HomeFragment extends Fragment {
 
                 FaceAndEmotion1 faceAndEmotion1 = new FaceAndEmotion1();
                 try {
+                    Log.d(TAG, "onActivityResult: called");
                     myEmotion = faceAndEmotion1.runModel(bitmap);
+                    Log.d(TAG, "onActivityResult: called1");
                     Log.d(TAG, "onActivityResult: Emotion: " + myEmotion);
                 } catch (FirebaseMLException e) {
                     e.printStackTrace();
@@ -221,13 +236,6 @@ public class HomeFragment extends Fragment {
 
     @SuppressLint("SetTextI18n")
     private void getEmotion() {
-
-        /*if (emotionTV.getText().equals("Happy")) {
-            emotionTV.setText("Sad");
-        } else {
-            emotionTV.setText("Happy");
-        }*/
-
         myEmotion = myEmotion.substring(0, 1).toUpperCase() + myEmotion.substring(1);
         emotionTV.setText(myEmotion);
         getSongBasedOnYourEmotion();
