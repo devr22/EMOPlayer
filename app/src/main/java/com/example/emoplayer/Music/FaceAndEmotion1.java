@@ -8,6 +8,7 @@ import androidx.annotation.NonNull;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.ml.common.FirebaseMLException;
 import com.google.firebase.ml.custom.FirebaseCustomLocalModel;
 import com.google.firebase.ml.custom.FirebaseModelDataType;
@@ -25,8 +26,7 @@ import com.google.firebase.ml.vision.face.FirebaseVisionFaceDetectorOptions;
 import java.util.Arrays;
 import java.util.List;
 
-public class
-FaceAndEmotion1 {
+public class FaceAndEmotion1 {
 
     private static final String TAG = "FaceAndEmotion1";
     private static final int width = 64;
@@ -36,9 +36,9 @@ FaceAndEmotion1 {
     FirebaseModelInterpreter firebaseInterpreter;
     FirebaseModelInputOutputOptions inputOutputOptions;
 
-    private Bitmap croppedBmp;
-    public String emotion = null;
-    public static Rect bounds;
+    public Bitmap croppedBmp;
+    public String emotion;
+    public static Rect bounds  = new Rect(1,2,3,4);
     public static List<String> label = Arrays.asList("angry", "disgust", "scared", "happy", "sad", "surprised", "neutral");
 
     public FaceAndEmotion1(){
@@ -86,7 +86,7 @@ FaceAndEmotion1 {
 
         FirebaseVisionFaceDetector detector = FirebaseVision.getInstance().getVisionFaceDetector(options);
 
-        Task<List<FirebaseVisionFace>> result =
+        /*Task<List<FirebaseVisionFace>> result =
                 detector.detectInImage(image)
                         .addOnSuccessListener(
                                 new OnSuccessListener<List<FirebaseVisionFace>>() {
@@ -108,8 +108,9 @@ FaceAndEmotion1 {
                                         // Task failed with an exception
                                         // ...
                                     }
-                                });
+                                });*/
 
+            croppedBmp = Bitmap.createBitmap(bitmap, bounds.left, bounds.top, bounds.right, bounds.bottom);
 
             Bitmap myBitmap = Bitmap.createScaledBitmap(croppedBmp, 64, 64, true);
             Bitmap bmpGrayscale = Bitmap.createBitmap(myBitmap.getWidth(), myBitmap.getHeight(), Bitmap.Config.ARGB_8888);
@@ -136,7 +137,7 @@ FaceAndEmotion1 {
                             float[][] output = result.getOutput(0);
                             float[] probabilities = output[0];
                             emotion = useInferenceResult(probabilities);
-                            Log.d(TAG, "emotion succesful :" );
+                            Log.d(TAG, "emotion successful :" + emotion);
 
                         }
                     })
@@ -158,6 +159,7 @@ FaceAndEmotion1 {
         int max = 0;
         for (int i = 1; i < probabilities.length; i++) {
             if (probabilities[i] > probabilities[max]) max = i;
+            Log.d(TAG, "useInferenceResult: prob: " + probabilities[i]);
         }
         return label.get(max);
     }

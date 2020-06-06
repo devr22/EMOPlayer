@@ -64,7 +64,7 @@ public class HomeFragment extends Fragment {
     Interpreter tflite;
 
     public Bitmap bitmap;
-    private String myEmotion = null;
+    private String myEmotion;
     public static List<String> label = Arrays.asList("angry", "disgust", "scared", "happy", "sad", "surprised", "neutral");
 
     private TextView emotionTV;
@@ -217,7 +217,9 @@ public class HomeFragment extends Fragment {
 
                 FaceAndEmotion1 faceAndEmotion1 = new FaceAndEmotion1();
                 try {
+                    Log.d(TAG, "onActivityResult: called");
                     myEmotion = faceAndEmotion1.runModel(bitmap);
+                    Log.d(TAG, "onActivityResult: called1");
                     Log.d(TAG, "onActivityResult: Emotion: " + myEmotion);
                 } catch (FirebaseMLException e) {
                     e.printStackTrace();
