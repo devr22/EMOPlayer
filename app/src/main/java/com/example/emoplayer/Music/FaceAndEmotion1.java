@@ -25,7 +25,8 @@ import com.google.firebase.ml.vision.face.FirebaseVisionFaceDetectorOptions;
 import java.util.Arrays;
 import java.util.List;
 
-public class FaceAndEmotion1 {
+public class
+FaceAndEmotion1 {
 
     private static final String TAG = "FaceAndEmotion1";
     private static final int width = 64;
@@ -35,10 +36,9 @@ public class FaceAndEmotion1 {
     FirebaseModelInterpreter firebaseInterpreter;
     FirebaseModelInputOutputOptions inputOutputOptions;
 
-    private Bitmap bmpGrayscale;
     private Bitmap croppedBmp;
     public String emotion = null;
-    public Rect bounds;
+    public static Rect bounds;
     public static List<String> label = Arrays.asList("angry", "disgust", "scared", "happy", "sad", "surprised", "neutral");
 
     public FaceAndEmotion1(){
@@ -71,7 +71,7 @@ public class FaceAndEmotion1 {
         return inputOutputOptions;
     }
 
-    public String runModel(final Bitmap bitmap) throws FirebaseMLException{
+    public String runModel(final Bitmap bitmap) throws FirebaseMLException {
 
         FirebaseVisionImage image = FirebaseVisionImage.fromBitmap(bitmap);
 
@@ -86,76 +86,72 @@ public class FaceAndEmotion1 {
 
         FirebaseVisionFaceDetector detector = FirebaseVision.getInstance().getVisionFaceDetector(options);
 
-        detector.detectInImage(image)
-                .addOnSuccessListener(new OnSuccessListener<List<FirebaseVisionFace>>() {
-                    @Override
-                    public void onSuccess(List<FirebaseVisionFace> faces) {
-                        // Task completed successfully
-                        for (FirebaseVisionFace face : faces) {
-                            Log.d(TAG, "runModel: Successful");
-                            bounds = face.getBoundingBox();
-                            croppedBmp = Bitmap.createBitmap(bitmap, bounds.left, bounds.top, bounds.right, bounds.bottom);
-                        }
-                        // ...
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        // Task failed with an exception
-                        Log.d(TAG, "runModel: Failed: " + e.getMessage());
-                        // ...
-                    }
-                });
+        Task<List<FirebaseVisionFace>> result =
+                detector.detectInImage(image)
+                        .addOnSuccessListener(
+                                new OnSuccessListener<List<FirebaseVisionFace>>() {
+                                    @Override
+                                    public void onSuccess(List<FirebaseVisionFace> faces) {
+                                        // Task completed successfully
+                                        for (FirebaseVisionFace face : faces) {
+                                            bounds = face.getBoundingBox();
+                                            croppedBmp = Bitmap.createBitmap(bitmap, bounds.left, bounds.top, bounds.right, bounds.bottom);
 
-        croppedBmp = Bitmap.createBitmap(bitmap, bounds.left, bounds.top, bounds.right, bounds.bottom);
+                                        }
+                                        // ...
+                                    }
+                                })
+                        .addOnFailureListener(
+                                new OnFailureListener() {
+                                    @Override
+                                    public void onFailure(@NonNull Exception e) {
+                                        // Task failed with an exception
+                                        // ...
+                                    }
+                                });
 
-        if (croppedBmp == null) {
-            Log.d(TAG, "runModel: croppedBmp is null");
-        }
 
-        Bitmap myBitmap = Bitmap.createScaledBitmap(croppedBmp, width, height, true);
-        if (myBitmap != null) {
-            Log.d(TAG, "runModel: myBitmap is not null");
-            bmpGrayscale = Bitmap.createBitmap(myBitmap.getWidth(), myBitmap.getHeight(), Bitmap.Config.ARGB_8888);
-        }
-        int batchNum = 0;
-        float[][][][] input = new float[1][64][64][1];
-        for (int x = 0; x < 64; x++) {
-            for (int y = 0; y < 64; y++) {
-                int pixel = bmpGrayscale.getPixel(x, y);
-                input[batchNum][x][y][0] = (pixel - 127) / 128.0f;
+            Bitmap myBitmap = Bitmap.createScaledBitmap(croppedBmp, 64, 64, true);
+            Bitmap bmpGrayscale = Bitmap.createBitmap(myBitmap.getWidth(), myBitmap.getHeight(), Bitmap.Config.ARGB_8888);
+            int batchNum = 0;
+            float[][][][] input = new float[1][64][64][1];
+            for (int x = 0; x < 64; x++) {
+                for (int y = 0; y < 64; y++) {
+                    int pixel = bmpGrayscale.getPixel(x, y);
+                    input[batchNum][x][y][0] = (pixel - 127) / 128.0f;
+                }
             }
+
+            FirebaseModelInputs inputs = new FirebaseModelInputs.Builder()
+                    .add(input)
+                    .build();
+
+            firebaseInterpreter.run(inputs, inputOutputOptions)
+                    .addOnSuccessListener(new OnSuccessListener<FirebaseModelOutputs>() {
+                        @Override
+                        public void onSuccess(FirebaseModelOutputs result) {
+                            // [START_EXCLUDE]
+                            // [START mlkit_read_result]
+                            Log.d(TAG, "runModel: interpreter run successful");
+                            float[][] output = result.getOutput(0);
+                            float[] probabilities = output[0];
+                            emotion = useInferenceResult(probabilities);
+                            Log.d(TAG, "emotion succesful :" );
+
+                        }
+                    })
+                    .addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            // Task failed with an exception
+                            Log.d(TAG, "runModel: interpreter failed : " + e.getMessage());
+                            // ...
+                        }
+                    });
+
+            return emotion;
         }
 
-        FirebaseModelInputs inputs = new FirebaseModelInputs.Builder()
-                .add(input)
-                .build();
-
-        firebaseInterpreter.run(inputs, inputOutputOptions)
-                .addOnSuccessListener(new OnSuccessListener<FirebaseModelOutputs>() {
-                    @Override
-                    public void onSuccess(FirebaseModelOutputs result) {
-                        // [START_EXCLUDE]
-                        // [START mlkit_read_result]
-                        Log.d(TAG,"runModel: interpreter run successful");
-                        float[][] output = result.getOutput(0);
-                        float[] probabilities = output[0];
-                        emotion =  useInferenceResult(probabilities);
-
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        // Task failed with an exception
-                        Log.d(TAG, "runModel: interpreter failed : " + e.getMessage());
-                        // ...
-                    }
-                });
-
-        return emotion;
-    }
 
     public String useInferenceResult(float[] probabilities) {
 
