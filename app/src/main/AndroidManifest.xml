@@ -12,22 +12,23 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".Music.MusicPlayerActivity"/>
-        <activity android:name=".Music.SongPlayerActivity" />
-        <activity android:name=".Music.SongsActivity" />
-        <activity android:name=".SignUp.RegistrationActivity" />
-        <activity android:name=".Login.LoginActivity" />
-        <activity android:name=".MainActivity">
+        <activity android:name=".SplashScreen">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".Music.MusicPlayerActivity" />
+        <activity android:name=".Music.SongPlayerActivity" />
+        <activity android:name=".Music.SongsActivity" />
+        <activity android:name=".SignUp.RegistrationActivity" />
+        <activity android:name=".Login.LoginActivity" />
+        <activity android:name=".MainActivity"/>
+
         <meta-data
             android:name="com.google.firebase.ml.vision.DEPENDENCIES"
             android:value="face" />
-        <!-- To use multiple models: android:value="face,model2,model3" -->
     </application>
 
 </manifest>

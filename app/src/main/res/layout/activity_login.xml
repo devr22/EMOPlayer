@@ -10,15 +10,22 @@
     android:padding="8dp"
     tools:context=".Login.LoginActivity">
 
-    <de.hdodenhof.circleimageview.CircleImageView
+    <!--<de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/login_logo"
         android:layout_width="110dp"
         android:layout_height="110dp"
         android:layout_marginTop="@dimen/spacing_xlarge"
-        android:scaleType="centerCrop"
-        android:src="@drawable/ic_launcher_background"
+        android:scaleType="centerInside"
+        android:src="@drawable/logo_transparent"
         app:civ_border_color="#FFF"
-        app:civ_border_width="2dp" />
+        app:civ_border_width="2dp" />-->
+
+    <ImageView
+        android:layout_width="120dp"
+        android:layout_height="120dp"
+        android:layout_marginTop="@dimen/spacing_large"
+        android:scaleType="centerInside"
+        android:src="@drawable/logo_transparent"/>
 
     <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
