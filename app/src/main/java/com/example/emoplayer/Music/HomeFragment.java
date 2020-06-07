@@ -1,10 +1,9 @@
 package com.example.emoplayer.Music;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.content.Intent;
-import android.content.res.AssetFileDescriptor;
 import android.graphics.Bitmap;
+import android.graphics.Rect;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Log;
@@ -38,13 +37,19 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.ml.common.FirebaseMLException;
+import com.google.firebase.ml.custom.FirebaseCustomLocalModel;
+import com.google.firebase.ml.custom.FirebaseModelDataType;
+import com.google.firebase.ml.custom.FirebaseModelInputOutputOptions;
+import com.google.firebase.ml.custom.FirebaseModelInputs;
+import com.google.firebase.ml.custom.FirebaseModelInterpreter;
+import com.google.firebase.ml.custom.FirebaseModelInterpreterOptions;
+import com.google.firebase.ml.custom.FirebaseModelOutputs;
+import com.google.firebase.ml.vision.FirebaseVision;
+import com.google.firebase.ml.vision.common.FirebaseVisionImage;
+import com.google.firebase.ml.vision.face.FirebaseVisionFace;
+import com.google.firebase.ml.vision.face.FirebaseVisionFaceDetector;
+import com.google.firebase.ml.vision.face.FirebaseVisionFaceDetectorOptions;
 
-import org.tensorflow.lite.Interpreter;
-
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.nio.MappedByteBuffer;
-import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -61,10 +66,15 @@ public class HomeFragment extends Fragment {
     public HomeFragment() {
     }
 
-    Interpreter tflite;
+    // Interpreter tflite;
+
+    FirebaseCustomLocalModel localModel;
+    FirebaseModelInterpreter firebaseInterpreter;
+    FirebaseModelInputOutputOptions inputOutputOptions;
 
     public Bitmap bitmap;
-    private String myEmotion;
+    public String emotion;
+    public Rect bounds;
     public static List<String> label = Arrays.asList("angry", "disgust", "scared", "happy", "sad", "surprised", "neutral");
 
     private TextView emotionTV;
@@ -95,11 +105,11 @@ public class HomeFragment extends Fragment {
         databaseEmotionSong = FirebaseFirestore.getInstance();
         databaseRecommendedSong = FirebaseFirestore.getInstance();
 
-        try {
+        /*try {
             tflite = new Interpreter(loadModelFile(getActivity()));
         } catch (IOException e) {
             e.printStackTrace();
-        }
+        }*/
 
         getUserDetail();
         getRecommendedSong();
@@ -199,23 +209,13 @@ public class HomeFragment extends Fragment {
             if (requestCode == IMAGE_PICK_CAMERA_CODE) {
 
                 bitmap = (Bitmap) data.getExtras().get("data");
-                //bitmap = Bitmap.createScaledBitmap(bitmap, bitmap.getWidth(), bitmap.getHeight(), false);
 
-                if (bitmap != null){
-                    Log.d(TAG, "onActivityResult: Image available");
-                }
+                runInterpreter();
+
 
                 //tflite.run(bitmap, label);
 
-                /*FaceAndEmotion faceAndEmotion = new FaceAndEmotion();
-                try {
-                    faceAndEmotion.runInference();
-                } catch (FirebaseMLException e) {
-                    Log.d(TAG, "onActivityResult: exception: " + e.getMessage());
-                }
-                myEmotion = faceAndEmotion.emotion;*/
-
-                FaceAndEmotion1 faceAndEmotion1 = new FaceAndEmotion1();
+                /*FaceAndEmotion1 faceAndEmotion1 = new FaceAndEmotion1();
                 try {
                     Log.d(TAG, "onActivityResult: called");
                     myEmotion = faceAndEmotion1.runModel(bitmap);
@@ -223,20 +223,151 @@ public class HomeFragment extends Fragment {
                     Log.d(TAG, "onActivityResult: Emotion: " + myEmotion);
                 } catch (FirebaseMLException e) {
                     e.printStackTrace();
-                }
+                }*/
 
-                if (myEmotion != null){
+                /*if (myEmotion != null) {
                     getEmotion();
-                }
+                }*/
 
                 Toast.makeText(getActivity(), "Clicked", Toast.LENGTH_SHORT).show();
             }
         }
     }
 
+    private void runInterpreter() {
+        localModel = new FirebaseCustomLocalModel.Builder().setAssetFilePath("converted_model.tflite").build();
+        try {
+            firebaseInterpreter = createInterpreter();
+        } catch (FirebaseMLException e) {
+            Log.d(TAG, "FaceAndEmotion1: Interpreter exception: " + e.getMessage());
+        }
+        try {
+            inputOutputOptions = createInputOutputOptions();
+        } catch (FirebaseMLException e) {
+            Log.d(TAG, "FaceAndEmotion1: Input output exception: " + e.getMessage());
+        }
+
+       runModel();
+    }
+
+    private FirebaseModelInterpreter createInterpreter() throws FirebaseMLException {
+
+        FirebaseModelInterpreterOptions options = new FirebaseModelInterpreterOptions.Builder(localModel).build();
+        FirebaseModelInterpreter interpreter = FirebaseModelInterpreter.getInstance(options);
+        return interpreter;
+    }
+
+    private FirebaseModelInputOutputOptions createInputOutputOptions() throws FirebaseMLException {
+
+        FirebaseModelInputOutputOptions inputOutputOptions = new FirebaseModelInputOutputOptions.Builder()
+                .setInputFormat(0, FirebaseModelDataType.FLOAT32, new int[]{1, 64, 64, 1})
+                .setOutputFormat(0, FirebaseModelDataType.FLOAT32, new int[]{1, 7})
+                .build();
+        return inputOutputOptions;
+    }
+
+    private void runModel() {
+
+        FirebaseVisionImage image = FirebaseVisionImage.fromBitmap(bitmap);
+
+        FirebaseVisionFaceDetectorOptions options = new FirebaseVisionFaceDetectorOptions.Builder()
+                .setClassificationMode(FirebaseVisionFaceDetectorOptions.ACCURATE)
+                .setLandmarkMode(FirebaseVisionFaceDetectorOptions.ALL_LANDMARKS)
+                .setClassificationMode(FirebaseVisionFaceDetectorOptions.ALL_CLASSIFICATIONS)
+                .setPerformanceMode(FirebaseVisionFaceDetectorOptions.ACCURATE)
+                .setMinFaceSize(0.15f)
+                .enableTracking()
+                .build();
+
+        FirebaseVisionFaceDetector detector = FirebaseVision.getInstance().getVisionFaceDetector(options);
+
+        detector.detectInImage(image)
+                .addOnSuccessListener(
+                        new OnSuccessListener<List<FirebaseVisionFace>>() {
+                            @Override
+                            public void onSuccess(List<FirebaseVisionFace> faces) {
+                                // Task completed successfully
+                                Log.d(TAG, "runModel: detector: successful");
+
+                                for (FirebaseVisionFace face : faces) {
+                                    bounds = face.getBoundingBox();
+                                }
+                                Bitmap croppedBmp = Bitmap.createBitmap(bitmap, bounds.left, bounds.top, bounds.right, bounds.bottom);
+                                try {
+                                    IdentifyEmotion(croppedBmp);
+                                } catch (FirebaseMLException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        })
+                .addOnFailureListener(
+                        new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                // Task failed with an exception
+                                Log.d(TAG, "runModel: detector: failed: " + e.getMessage());
+                            }
+                        });
+
+        //croppedBmp = Bitmap.createBitmap(bitmap, bounds.left, bounds.top, bounds.right, bounds.bottom);
+
+    }
+
+    private void IdentifyEmotion(Bitmap croppedBmp) throws FirebaseMLException {
+
+        Bitmap myBitmap = Bitmap.createScaledBitmap(croppedBmp, 64, 64, true);
+        Bitmap bmpGrayscale = Bitmap.createBitmap(myBitmap.getWidth(), myBitmap.getHeight(), Bitmap.Config.ARGB_8888);
+        int batchNum = 0;
+        float[][][][] input = new float[1][64][64][1];
+        for (int x = 0; x < 64; x++) {
+            for (int y = 0; y < 64; y++) {
+                int pixel = bmpGrayscale.getPixel(x, y);
+                input[batchNum][x][y][0] = (pixel - 127) / 128.0f;
+            }
+        }
+
+        FirebaseModelInputs inputs = new FirebaseModelInputs.Builder()
+                .add(input)
+                .build();
+
+        firebaseInterpreter.run(inputs, inputOutputOptions)
+                .addOnSuccessListener(new OnSuccessListener<FirebaseModelOutputs>() {
+                    @Override
+                    public void onSuccess(FirebaseModelOutputs result) {
+                        // [START_EXCLUDE]
+                        // [START mlkit_read_result]
+                        Log.d(TAG, "IdentifyEmotion: interpreter run successful");
+                        float[][] output = result.getOutput(0);
+                        float[] probabilities = output[0];
+                        emotion = useInferenceResult(probabilities);
+                        Log.d(TAG, "emotion successful :" + emotion);
+                        getEmotion();
+
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        // Task failed with an exception
+                        Log.d(TAG, "IdentifyEmotion: interpreter failed : " + e.getMessage());
+                        Toast.makeText(getActivity(), "Can't detect your emotion", Toast.LENGTH_SHORT).show();
+                    }
+                });
+    }
+
+    public String useInferenceResult(float[] probabilities) {
+
+        int max = 0;
+        for (int i = 1; i < probabilities.length; i++) {
+            if (probabilities[i] > probabilities[max]) max = i;
+            Log.d(TAG, "useInferenceResult: prob: " + probabilities[i]);
+        }
+        return label.get(max);
+    }
+
     @SuppressLint("SetTextI18n")
     private void getEmotion() {
-        myEmotion = myEmotion.substring(0, 1).toUpperCase() + myEmotion.substring(1);
+        String myEmotion = emotion.substring(0, 1).toUpperCase() + emotion.substring(1);
         emotionTV.setText(myEmotion);
         getSongBasedOnYourEmotion();
     }
@@ -319,14 +450,14 @@ public class HomeFragment extends Fragment {
     /**
      * Memory-map the model file in Assets.
      */
-    private MappedByteBuffer loadModelFile(Activity activity) throws IOException {
+    /*private MappedByteBuffer loadModelFile(Activity activity) throws IOException {
         AssetFileDescriptor fileDescriptor = activity.getAssets().openFd(MODEL_PATH);
         FileInputStream inputStream = new FileInputStream(fileDescriptor.getFileDescriptor());
         FileChannel fileChannel = inputStream.getChannel();
         long startOffset = fileDescriptor.getStartOffset();
         long declaredLength = fileDescriptor.getDeclaredLength();
         return fileChannel.map(FileChannel.MapMode.READ_ONLY, startOffset, declaredLength);
-    }
+    }*/
 
 }
 

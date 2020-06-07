@@ -1,18 +1,12 @@
 package com.example.emoplayer;
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.FragmentTransaction;
-
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.View;
-import android.widget.Button;
-import android.widget.TextView;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.emoplayer.Login.LoginActivity;
 import com.example.emoplayer.Music.SongsActivity;
-import com.example.emoplayer.SignUp.RegistrationActivity;
-import com.example.emoplayer.SignUp.SignUpFragment;
 import com.example.emoplayer.Utils.AppPermission;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
