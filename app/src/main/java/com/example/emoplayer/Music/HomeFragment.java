@@ -271,48 +271,69 @@ public class HomeFragment extends Fragment {
         FirebaseVisionImage image = FirebaseVisionImage.fromBitmap(bitmap);
 
         FirebaseVisionFaceDetectorOptions options = new FirebaseVisionFaceDetectorOptions.Builder()
-                .setClassificationMode(FirebaseVisionFaceDetectorOptions.ACCURATE)
-                .setLandmarkMode(FirebaseVisionFaceDetectorOptions.ALL_LANDMARKS)
-                .setClassificationMode(FirebaseVisionFaceDetectorOptions.ALL_CLASSIFICATIONS)
-                .setPerformanceMode(FirebaseVisionFaceDetectorOptions.ACCURATE)
-                .setMinFaceSize(0.15f)
-                .enableTracking()
+//                .setClassificationMode(FirebaseVisionFaceDetectorOptions.ACCURATE)
+//                .setLandmarkMode(FirebaseVisionFaceDetectorOptions.ALL_LANDMARKS)
+//                .setClassificationMode(FirebaseVisionFaceDetectorOptions.ALL_CLASSIFICATIONS)
+//                .setPerformanceMode(FirebaseVisionFaceDetectorOptions.ACCURATE)
+//                .setMinFaceSize(0.15f)
+//                .enableTracking()
                 .build();
 
         FirebaseVisionFaceDetector detector = FirebaseVision.getInstance().getVisionFaceDetector(options);
 
         detector.detectInImage(image)
-                .addOnSuccessListener(
-                        new OnSuccessListener<List<FirebaseVisionFace>>() {
-                            @Override
-                            public void onSuccess(List<FirebaseVisionFace> faces) {
-                                // Task completed successfully
-                                Log.d(TAG, "runModel: detector: successful");
+                .addOnSuccessListener(new OnSuccessListener<List<FirebaseVisionFace>>() {
+                                          @Override
+                                          public void onSuccess(List<FirebaseVisionFace> faces) {
+                                              getFaceResults(faces);
+                                          }
+                                      }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Log.d(TAG, "runModel: detector: failed: " + e.getMessage());
+            }
+        })
+//                        new OnSuccessListener<List<FirebaseVisionFace>>() {
+//                            @Override
+//                            public void onSuccess(List<FirebaseVisionFace> faces) {
+//                                // Task completed successfully
+//                                Log.d(TAG, "runModel: detector: successful");
+//
+//                                for (FirebaseVisionFace face : faces) {
+//                                    bounds = face.getBoundingBox();
+//                                }
+//                                Bitmap croppedBmp = Bitmap.createBitmap(bitmap, bounds.left, bounds.top, bounds.right, bounds.bottom);
+//                                try {
+//                                    IdentifyEmotion(croppedBmp);
+//                                } catch (FirebaseMLException e) {
+//                                    e.printStackTrace();
+//                                }
+//                            }
+//                        })
+//                .addOnFailureListener(
+//                        new OnFailureListener() {
+//                            @Override
+//                            public void onFailure(@NonNull Exception e) {
+//                                // Task failed with an exception
+//                                Log.d(TAG, "runModel: detector: failed: " + e.getMessage());
+//                            }
+//                        });
 
-                                for (FirebaseVisionFace face : faces) {
-                                    bounds = face.getBoundingBox();
-                                }
-                                Bitmap croppedBmp = Bitmap.createBitmap(bitmap, bounds.left, bounds.top, bounds.right, bounds.bottom);
+                        //croppedBmp = Bitmap.createBitmap(bitmap, bounds.left, bounds.top, bounds.right, bounds.bottom);
+
+    }
+
+    private void getFaceResults(List<FirebaseVisionFace> faces) {
+        for (FirebaseVisionFace face : faces) {
+            bounds = face.getBoundingBox();
+            Bitmap croppedBmp = Bitmap.createBitmap(bitmap, bounds.left, bounds.top, bounds.right, bounds.bottom);
                                 try {
                                     IdentifyEmotion(croppedBmp);
                                 } catch (FirebaseMLException e) {
                                     e.printStackTrace();
                                 }
-                            }
-                        })
-                .addOnFailureListener(
-                        new OnFailureListener() {
-                            @Override
-                            public void onFailure(@NonNull Exception e) {
-                                // Task failed with an exception
-                                Log.d(TAG, "runModel: detector: failed: " + e.getMessage());
-                            }
-                        });
-
-        //croppedBmp = Bitmap.createBitmap(bitmap, bounds.left, bounds.top, bounds.right, bounds.bottom);
-
+        }
     }
-
     private void IdentifyEmotion(Bitmap croppedBmp) throws FirebaseMLException {
 
         Bitmap myBitmap = Bitmap.createScaledBitmap(croppedBmp, 64, 64, true);
