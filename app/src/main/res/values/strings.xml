@@ -40,5 +40,7 @@
     <string name="songs">Songs</string>
     <string name="unknown">Unknown</string>
     <string name="logout">LOGOUT</string>
+    <string name="my_selfie">My Selfie</string>
+    <string name="cancel">Cancel</string>
 
 </resources>

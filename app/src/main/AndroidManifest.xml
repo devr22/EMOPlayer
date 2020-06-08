@@ -20,7 +20,6 @@
             </intent-filter>
         </activity>
         <activity android:name=".Music.MusicPlayerActivity" />
-        <activity android:name=".Music.SongPlayerActivity" />
         <activity android:name=".Music.SongsActivity" />
         <activity android:name=".SignUp.RegistrationActivity" />
         <activity android:name=".Login.LoginActivity" />

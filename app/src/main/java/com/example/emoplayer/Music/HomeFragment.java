@@ -1,6 +1,7 @@
 package com.example.emoplayer.Music;
 
 import android.annotation.SuppressLint;
+import android.app.Dialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Rect;
@@ -10,7 +11,10 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
+import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -66,15 +70,12 @@ public class HomeFragment extends Fragment {
     public HomeFragment() {
     }
 
-    // Interpreter tflite;
-
     FirebaseCustomLocalModel localModel;
     FirebaseModelInterpreter firebaseInterpreter;
     FirebaseModelInputOutputOptions inputOutputOptions;
 
-    public Bitmap bitmap;
     public String emotion;
-    public Rect bounds;
+    private Rect bounds;
     public static List<String> label = Arrays.asList("angry", "disgust", "scared", "happy", "sad", "surprised", "neutral");
 
     private TextView emotionTV;
@@ -104,12 +105,6 @@ public class HomeFragment extends Fragment {
         databaseUser = FirebaseFirestore.getInstance();
         databaseEmotionSong = FirebaseFirestore.getInstance();
         databaseRecommendedSong = FirebaseFirestore.getInstance();
-
-        /*try {
-            tflite = new Interpreter(loadModelFile(getActivity()));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }*/
 
         getUserDetail();
         getRecommendedSong();
@@ -174,9 +169,9 @@ public class HomeFragment extends Fragment {
 
         if (model_users.getUserName().equals("")) {
             c = model_users.getEmail().charAt(0);
+        } else {
+            c = model_users.getUserName().charAt(0);
         }
-
-        c = model_users.getUserName().charAt(0);
         display = Character.toString(c).toUpperCase();
 
         displayNameTV.setText(display);
@@ -208,34 +203,17 @@ public class HomeFragment extends Fragment {
         if (resultCode == RESULT_OK) {
             if (requestCode == IMAGE_PICK_CAMERA_CODE) {
 
-                bitmap = (Bitmap) data.getExtras().get("data");
+                Bitmap bitmap = (Bitmap) data.getExtras().get("data");
 
-                runInterpreter();
+                Log.d(TAG, "onActivityResult: bitmap -> " + bitmap);
 
-
-                //tflite.run(bitmap, label);
-
-                /*FaceAndEmotion1 faceAndEmotion1 = new FaceAndEmotion1();
-                try {
-                    Log.d(TAG, "onActivityResult: called");
-                    myEmotion = faceAndEmotion1.runModel(bitmap);
-                    Log.d(TAG, "onActivityResult: called1");
-                    Log.d(TAG, "onActivityResult: Emotion: " + myEmotion);
-                } catch (FirebaseMLException e) {
-                    e.printStackTrace();
-                }*/
-
-                /*if (myEmotion != null) {
-                    getEmotion();
-                }*/
-
-                Toast.makeText(getActivity(), "Clicked", Toast.LENGTH_SHORT).show();
+                runInterpreter(bitmap);
             }
         }
     }
 
-    private void runInterpreter() {
-        localModel = new FirebaseCustomLocalModel.Builder().setAssetFilePath("converted_model.tflite").build();
+    private void runInterpreter(Bitmap bitmap) {
+        localModel = new FirebaseCustomLocalModel.Builder().setAssetFilePath(MODEL_PATH).build();
         try {
             firebaseInterpreter = createInterpreter();
         } catch (FirebaseMLException e) {
@@ -246,8 +224,7 @@ public class HomeFragment extends Fragment {
         } catch (FirebaseMLException e) {
             Log.d(TAG, "FaceAndEmotion1: Input output exception: " + e.getMessage());
         }
-
-       runModel();
+        runModel(bitmap);
     }
 
     private FirebaseModelInterpreter createInterpreter() throws FirebaseMLException {
@@ -266,78 +243,72 @@ public class HomeFragment extends Fragment {
         return inputOutputOptions;
     }
 
-    private void runModel() {
+    private void runModel(final Bitmap bitmap) {
 
         FirebaseVisionImage image = FirebaseVisionImage.fromBitmap(bitmap);
 
         FirebaseVisionFaceDetectorOptions options = new FirebaseVisionFaceDetectorOptions.Builder()
-//                .setClassificationMode(FirebaseVisionFaceDetectorOptions.ACCURATE)
-//                .setLandmarkMode(FirebaseVisionFaceDetectorOptions.ALL_LANDMARKS)
-//                .setClassificationMode(FirebaseVisionFaceDetectorOptions.ALL_CLASSIFICATIONS)
-//                .setPerformanceMode(FirebaseVisionFaceDetectorOptions.ACCURATE)
-//                .setMinFaceSize(0.15f)
-//                .enableTracking()
+                .setClassificationMode(FirebaseVisionFaceDetectorOptions.ACCURATE)
+                .setLandmarkMode(FirebaseVisionFaceDetectorOptions.ALL_LANDMARKS)
+                .setClassificationMode(FirebaseVisionFaceDetectorOptions.ALL_CLASSIFICATIONS)
+                .setPerformanceMode(FirebaseVisionFaceDetectorOptions.ACCURATE)
+                .setMinFaceSize(0.15f)
+                .enableTracking()
                 .build();
 
         FirebaseVisionFaceDetector detector = FirebaseVision.getInstance().getVisionFaceDetector(options);
 
-        detector.detectInImage(image)
-                .addOnSuccessListener(new OnSuccessListener<List<FirebaseVisionFace>>() {
-                                          @Override
-                                          public void onSuccess(List<FirebaseVisionFace> faces) {
-                                              getFaceResults(faces);
-                                          }
-                                      }).addOnFailureListener(new OnFailureListener() {
+        detector.detectInImage(image).addOnSuccessListener(new OnSuccessListener<List<FirebaseVisionFace>>() {
+            @Override
+            public void onSuccess(List<FirebaseVisionFace> faces) {
+                getFaceResults(faces, bitmap);
+            }
+        }).addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception e) {
                 Log.d(TAG, "runModel: detector: failed: " + e.getMessage());
             }
-        })
-//                        new OnSuccessListener<List<FirebaseVisionFace>>() {
-//                            @Override
-//                            public void onSuccess(List<FirebaseVisionFace> faces) {
-//                                // Task completed successfully
-//                                Log.d(TAG, "runModel: detector: successful");
-//
-//                                for (FirebaseVisionFace face : faces) {
-//                                    bounds = face.getBoundingBox();
-//                                }
-//                                Bitmap croppedBmp = Bitmap.createBitmap(bitmap, bounds.left, bounds.top, bounds.right, bounds.bottom);
-//                                try {
-//                                    IdentifyEmotion(croppedBmp);
-//                                } catch (FirebaseMLException e) {
-//                                    e.printStackTrace();
-//                                }
-//                            }
-//                        })
-//                .addOnFailureListener(
-//                        new OnFailureListener() {
-//                            @Override
-//                            public void onFailure(@NonNull Exception e) {
-//                                // Task failed with an exception
-//                                Log.d(TAG, "runModel: detector: failed: " + e.getMessage());
-//                            }
-//                        });
-
-                        //croppedBmp = Bitmap.createBitmap(bitmap, bounds.left, bounds.top, bounds.right, bounds.bottom);
+        });
 
     }
 
-    private void getFaceResults(List<FirebaseVisionFace> faces) {
-        for (FirebaseVisionFace face : faces) {
+    private void getFaceResults(List<FirebaseVisionFace> faces, Bitmap bitmap) {
+
+        /*for (FirebaseVisionFace face : faces) {
             bounds = face.getBoundingBox();
-            Bitmap croppedBmp = Bitmap.createBitmap(bitmap, bounds.left, bounds.top, bounds.right, bounds.bottom);
-                                try {
-                                    IdentifyEmotion(croppedBmp);
-                                } catch (FirebaseMLException e) {
-                                    e.printStackTrace();
-                                }
+        }*/
+        //Bitmap croppedBmp = Bitmap.createBitmap(bitmap, bounds.left, bounds.top, bounds.width(), bounds.height());
+
+        if (faces.size() > 0) {
+            FirebaseVisionFace face = faces.get(0);
+            bounds = face.getBoundingBox();
+            Log.d(TAG, "getFaceResults: left = " + bounds.left);
+            Log.d(TAG, "getFaceResults: right = " + bounds.right);
+            Log.d(TAG, "getFaceResults: top = " + bounds.top);
+            Log.d(TAG, "getFaceResults: bottom = " + bounds.bottom);
+        }
+
+        Bitmap croppedBmp = Bitmap.createBitmap(bitmap, bounds.left, bounds.top, bounds.width(), bounds.height());
+
+
+        if (croppedBmp != null) {
+
+            Log.d(TAG, "getFaceResults: croppedBmp: " + croppedBmp);
+            try {
+                IdentifyEmotion(croppedBmp);
+            } catch (FirebaseMLException e) {
+                e.printStackTrace();
+            }
         }
     }
+
     private void IdentifyEmotion(Bitmap croppedBmp) throws FirebaseMLException {
 
         Bitmap myBitmap = Bitmap.createScaledBitmap(croppedBmp, 64, 64, true);
-        Bitmap bmpGrayscale = Bitmap.createBitmap(myBitmap.getWidth(), myBitmap.getHeight(), Bitmap.Config.ARGB_8888);
+        //Bitmap bmpGrayscale = Bitmap.createBitmap(myBitmap.getWidth(), myBitmap.getHeight(), Bitmap.Config.ARGB_8888);
+
+        Bitmap bmpGrayscale = myBitmap.copy(Bitmap.Config.ARGB_8888, true);
+
         int batchNum = 0;
         float[][][][] input = new float[1][64][64][1];
         for (int x = 0; x < 64; x++) {
@@ -467,18 +438,6 @@ public class HomeFragment extends Fragment {
             }
         });
     }
-
-    /**
-     * Memory-map the model file in Assets.
-     */
-    /*private MappedByteBuffer loadModelFile(Activity activity) throws IOException {
-        AssetFileDescriptor fileDescriptor = activity.getAssets().openFd(MODEL_PATH);
-        FileInputStream inputStream = new FileInputStream(fileDescriptor.getFileDescriptor());
-        FileChannel fileChannel = inputStream.getChannel();
-        long startOffset = fileDescriptor.getStartOffset();
-        long declaredLength = fileDescriptor.getDeclaredLength();
-        return fileChannel.map(FileChannel.MapMode.READ_ONLY, startOffset, declaredLength);
-    }*/
 
 }
 

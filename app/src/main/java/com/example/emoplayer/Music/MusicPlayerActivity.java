@@ -140,8 +140,7 @@ public class MusicPlayerActivity extends AppCompatActivity implements JcPlayerMa
 
     @Override
     public void onPlaying(JcStatus jcStatus) {
-        String songTitle = jcStatus.getJcAudio().getTitle();
-        replaceSongIconImage(songTitle);
+
     }
 
     @Override
