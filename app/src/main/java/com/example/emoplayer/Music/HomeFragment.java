@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.graphics.Rect;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -83,6 +84,7 @@ public class HomeFragment extends Fragment {
     private ImageButton cameraButton;
     private RecyclerView recommend_recyclerView;
     private RecyclerView emotion_recyclerView;
+    //private ImageView imageView;
 
     private FirebaseUser user;
     private FirebaseFirestore databaseUser;
@@ -126,6 +128,7 @@ public class HomeFragment extends Fragment {
         cameraButton = view.findViewById(R.id.home_cameraButton);
         recommend_recyclerView = view.findViewById(R.id.home_recyclerView_recommendation);
         emotion_recyclerView = view.findViewById(R.id.home_recyclerView_emotion);
+        //imageView = view.findViewById(R.id.home_imageView);
 
         emotion_recyclerView.setHasFixedSize(true);
         emotion_recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
@@ -288,7 +291,13 @@ public class HomeFragment extends Fragment {
             Log.d(TAG, "getFaceResults: bottom = " + bounds.bottom);
         }
 
-        Bitmap croppedBmp = Bitmap.createBitmap(bitmap, bounds.left, bounds.top, bounds.width(), bounds.height());
+        Bitmap croppedBmp = null;
+
+        try {
+            croppedBmp = Bitmap.createBitmap(bitmap, bounds.left, bounds.top, bounds.width(), bounds.height());
+        } catch (Exception e) {
+            Log.d(TAG, "");
+        }
 
 
         if (croppedBmp != null) {
@@ -305,16 +314,17 @@ public class HomeFragment extends Fragment {
     private void IdentifyEmotion(Bitmap croppedBmp) throws FirebaseMLException {
 
         Bitmap myBitmap = Bitmap.createScaledBitmap(croppedBmp, 64, 64, true);
-        //Bitmap bmpGrayscale = Bitmap.createBitmap(myBitmap.getWidth(), myBitmap.getHeight(), Bitmap.Config.ARGB_8888);
+        Bitmap bmpGrayscale = test(myBitmap);
 
-        Bitmap bmpGrayscale = myBitmap.copy(Bitmap.Config.ARGB_8888, true);
+        //Bitmap bmpGrayscale = Bitmap.createBitmap(myBitmap.getWidth(), myBitmap.getHeight(), Bitmap.Config.ARGB_8888);
+        //imageView.setImageBitmap(bmpGrayscale);
 
         int batchNum = 0;
         float[][][][] input = new float[1][64][64][1];
         for (int x = 0; x < 64; x++) {
             for (int y = 0; y < 64; y++) {
                 int pixel = bmpGrayscale.getPixel(x, y);
-                input[batchNum][x][y][0] = (pixel - 127) / 128.0f;
+                input[batchNum][x][y][0] = (pixel - 127) / 255.0f;
             }
         }
 
@@ -350,7 +360,7 @@ public class HomeFragment extends Fragment {
     public String useInferenceResult(float[] probabilities) {
 
         int max = 0;
-        for (int i = 1; i < probabilities.length; i++) {
+        for (int i = 0; i < probabilities.length; i++) {
             if (probabilities[i] > probabilities[max]) max = i;
             Log.d(TAG, "useInferenceResult: prob: " + probabilities[i]);
         }
@@ -410,7 +420,8 @@ public class HomeFragment extends Fragment {
                                 Model_Songs model_song = document.toObject(Model_Songs.class);
                                 songList.add(model_song);
                             }
-                            int songListSize = songList.size();
+                            int songListSize = songList.size() / 3;
+
 
                             for (int i = 0; i < songListSize; i++) {
 
@@ -437,6 +448,37 @@ public class HomeFragment extends Fragment {
                 Log.d(TAG, "getRecommendedSong: failed: " + e.getMessage());
             }
         });
+    }
+
+    public static Bitmap test(Bitmap src) {
+
+        int width = src.getWidth();
+        int height = src.getHeight();
+        // create output bitmap
+        Bitmap bmOut = Bitmap.createBitmap(width, height, src.getConfig());
+        // color information
+        int A, R, G, B;
+        int pixel;
+        for (int x = 0; x < width; ++x) {
+            for (int y = 0; y < height; ++y) {
+                // get pixel color
+                pixel = src.getPixel(x, y);
+                A = Color.alpha(pixel);
+                R = Color.red(pixel);
+                G = Color.green(pixel);
+                B = Color.blue(pixel);
+                int gray = (int) (0.2989 * R + 0.5870 * G + 0.1140 * B);
+                // use 128 as threshold, above -> white, below -> black
+                if (gray > 128) {
+                    gray = 255;
+                } else {
+                    gray = 0;
+                }
+                // set new pixel color to output bitmap
+                bmOut.setPixel(x, y, Color.argb(A, gray, gray, gray));
+            }
+        }
+        return bmOut;
     }
 
 }

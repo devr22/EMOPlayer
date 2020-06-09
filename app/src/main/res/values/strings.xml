@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">EMOPlayer</string>
+    <string name="app_name">EmoPlayer</string>
     <string name="username_or_email">UserName or Email</string>
     <string name="password">Password</string>
     <string name="sign_in">SIGN IN</string>
@@ -42,5 +42,6 @@
     <string name="logout">LOGOUT</string>
     <string name="my_selfie">My Selfie</string>
     <string name="cancel">Cancel</string>
+    <string name="unknown_gmail_com">unknown@gmail.com</string>
 
 </resources>

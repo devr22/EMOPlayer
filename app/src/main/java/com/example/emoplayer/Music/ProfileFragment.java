@@ -150,16 +150,16 @@ public class ProfileFragment extends Fragment {
 
         if (user.getUserName().equals("")) {
             c = user.getEmail().charAt(0);
+        } else {
+            c = user.getUserName().charAt(0);
         }
-
-        c = user.getUserName().charAt(0);
         display = Character.toString(c);
 
         displayNameTV.setText(display);
 
     }
 
-    private void getCountOfFavouritesSong(){
+    private void getCountOfFavouritesSong() {
 
         String userId = user.getUid();
 
@@ -169,16 +169,15 @@ public class ProfileFragment extends Fragment {
                     @Override
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
 
-                        if (task.isSuccessful()){
+                        if (task.isSuccessful()) {
                             songList.clear();
-                            for (QueryDocumentSnapshot document : task.getResult()){
+                            for (QueryDocumentSnapshot document : task.getResult()) {
 
                                 Model_Songs_Favourites song = document.toObject(Model_Songs_Favourites.class);
                                 songList.add(song);
                             }
                             favouritesTV.setText(String.valueOf(songList.size()));
-                        }
-                        else {
+                        } else {
                             Log.d(TAG, "getCountOfFavouritesSong: Error in getting document: " + task.getException());
                         }
                     }
@@ -191,7 +190,7 @@ public class ProfileFragment extends Fragment {
         });
     }
 
-    private void LogOut(){
+    private void LogOut() {
 
         FirebaseAuth.getInstance().signOut();
 

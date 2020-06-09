@@ -4,17 +4,22 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.text.InputType;
 import android.util.Log;
 import android.util.Patterns;
 import android.view.View;
+import android.view.Window;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -24,6 +29,7 @@ import com.example.emoplayer.SignUp.RegistrationActivity;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -35,9 +41,10 @@ public class LoginActivity extends AppCompatActivity {
     TextView signUp, forgotPassword;
     EditText emailEt, passwordEt;
     Button loginButton;
+    Dialog dialog;
+    LinearLayout layout;
 
     FirebaseAuth mAuth;
-    ProgressDialog progressDialog;
 
     String email, password;
 
@@ -46,15 +53,8 @@ public class LoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        emailEt = findViewById(R.id.login_email);
-        passwordEt = findViewById(R.id.login_password);
-        forgotPassword = findViewById(R.id.login_forgotPassword);
-        loginButton = findViewById(R.id.login_loginButton);
-        signUp = findViewById(R.id.login_signUp);
-
         mAuth = FirebaseAuth.getInstance();
-
-        progressDialog = new ProgressDialog(this);
+        initViews();
 
         loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -78,6 +78,16 @@ public class LoginActivity extends AppCompatActivity {
         });
     }
 
+    private void initViews() {
+        emailEt = findViewById(R.id.login_email);
+        passwordEt = findViewById(R.id.login_password);
+        forgotPassword = findViewById(R.id.login_forgotPassword);
+        loginButton = findViewById(R.id.login_loginButton);
+        signUp = findViewById(R.id.login_signUp);
+        dialog = new Dialog(this);
+        layout = findViewById(R.id.login_layout);
+    }
+
     private void inputValidation() {
 
         email = emailEt.getText().toString().trim();
@@ -93,18 +103,16 @@ public class LoginActivity extends AppCompatActivity {
 
     private void signIn() {
 
-        progressDialog.setMessage("Logging In...");
-        progressDialog.show();
+        showProgressDialog();
 
         mAuth.signInWithEmailAndPassword(email, password)
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
 
-                        progressDialog.dismiss();
+                        hideProgressDialog();
 
                         if (task.isSuccessful()) {
-
                             Log.d(TAG, "signInWithEmail:success");
                             FirebaseUser user = mAuth.getCurrentUser();
 
@@ -112,7 +120,6 @@ public class LoginActivity extends AppCompatActivity {
                             finish();
 
                         } else {
-
                             Log.d(TAG, "signInWithEmail:failed", task.getException());
                             Toast.makeText(LoginActivity.this, "Authentication failed.", Toast.LENGTH_SHORT).show();
                         }
@@ -121,8 +128,8 @@ public class LoginActivity extends AppCompatActivity {
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
-                        progressDialog.dismiss();
-                        Toast.makeText(LoginActivity.this, "" + e.getMessage(), Toast.LENGTH_SHORT).show();
+                        hideProgressDialog();
+                        Toast.makeText(LoginActivity.this, "" + e.getMessage(), Toast.LENGTH_LONG).show();
                     }
                 });
     }
@@ -152,7 +159,15 @@ public class LoginActivity extends AppCompatActivity {
             public void onClick(DialogInterface dialogInterface, int i) {
 
                 String inputEmail = emailEt.getText().toString().trim();
-                beginRecovery(inputEmail);
+
+                if (!inputEmail.equals("")) {
+                    beginRecovery(inputEmail);
+                }
+                else {
+                    Snackbar.make(layout, "Please enter email..", Snackbar.LENGTH_LONG)
+                            .setBackgroundTint(getColor(R.color.colorPrimary))
+                            .show();
+                }
 
             }
         });
@@ -161,48 +176,56 @@ public class LoginActivity extends AppCompatActivity {
         builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
-
                 dialogInterface.dismiss();
-
             }
         });
 
-        //show dialog
         builder.create().show();
     }
 
     private void beginRecovery(String email) {
 
-        progressDialog.setMessage("Sending email...");
-        progressDialog.show();
+        showProgressDialog();
 
         mAuth.sendPasswordResetEmail(email).addOnCompleteListener(new OnCompleteListener<Void>() {
-
             @Override
             public void onComplete(@NonNull Task<Void> task) {
 
-                progressDialog.dismiss();
+                hideProgressDialog();
 
                 if (task.isSuccessful()) {
-
-                    Toast.makeText(LoginActivity.this, "Email sent for Password Recovery", Toast.LENGTH_SHORT).show();
+                    Snackbar.make(layout, "Email Sent", Snackbar.LENGTH_LONG)
+                            .setBackgroundTint(getColor(R.color.colorPrimary))
+                            .show();
                 } else {
-                    Toast.makeText(LoginActivity.this, "Failed...", Toast.LENGTH_SHORT).show();
+                    Snackbar.make(layout, "Failed!", Snackbar.LENGTH_LONG)
+                            .setBackgroundTint(getColor(R.color.colorPrimary))
+                            .show();
                 }
-
             }
         }).addOnFailureListener(new OnFailureListener() {
-
             @Override
             public void onFailure(@NonNull Exception e) {
 
-                progressDialog.dismiss();
-                Log.d(TAG, "beginRecovery: onFailure: " + e.getMessage());
-                Toast.makeText(LoginActivity.this, "" + e.getMessage(), Toast.LENGTH_SHORT).show();
+                hideProgressDialog();
 
+                Snackbar.make(layout, "Failed!", Snackbar.LENGTH_LONG)
+                        .setBackgroundTint(getColor(R.color.colorPrimary))
+                        .show();
             }
         });
 
+    }
+
+    private void showProgressDialog() {
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.setContentView(R.layout.custom_progress_dialog);
+        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        dialog.show();
+    }
+
+    private void hideProgressDialog() {
+        dialog.dismiss();
     }
 
 

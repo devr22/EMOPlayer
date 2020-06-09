@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -8,17 +7,6 @@
     android:orientation="vertical"
     android:padding="20dp"
     tools:context=".SignUp.SignUpFragment">
-
-    <!--<de.hdodenhof.circleimageview.CircleImageView
-        android:id="@+id/signUp_logo"
-        android:layout_width="110dp"
-        android:layout_height="110dp"
-        android:layout_marginTop="@dimen/spacing_xlarge"
-        android:scaleType="centerInside"
-        android:adjustViewBounds="true"
-        android:src="@drawable/logo_transparent"
-        app:civ_border_color="#FFF"
-        app:civ_border_width="2dp" />-->
 
     <ImageView
         android:layout_width="120dp"

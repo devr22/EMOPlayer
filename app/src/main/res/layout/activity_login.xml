@@ -2,6 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/login_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#263238"
@@ -15,7 +16,7 @@
         android:layout_height="120dp"
         android:layout_marginTop="@dimen/spacing_large"
         android:scaleType="centerInside"
-        android:src="@drawable/logo_transparent"/>
+        android:src="@drawable/logo_transparent" />
 
     <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
@@ -105,7 +106,7 @@
                     android:background="@drawable/button_background"
                     android:text="@string/login"
                     android:textAllCaps="false"
-                    android:textSize="20sp"/>
+                    android:textSize="20sp" />
 
             </LinearLayout>
 

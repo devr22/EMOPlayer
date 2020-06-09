@@ -1,6 +1,9 @@
 package com.example.emoplayer.SignUp;
 
+import android.app.Dialog;
 import android.app.ProgressDialog;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -16,6 +19,7 @@ import android.util.Patterns;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Toast;
@@ -42,10 +46,10 @@ public class SignUpFragment extends Fragment {
     private ImageButton submit, passwordToggle, confirmPasswordToggle;
     private EditText emailEt, passwordEt, confirmPasswordEt;
 
-    private ProgressDialog progressDialog;
-
     private FirebaseAuth mAuth;
     private FirebaseFirestore database;
+
+    private Dialog dialog;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -82,16 +86,13 @@ public class SignUpFragment extends Fragment {
     }
 
     private void initView(View view) {
-
         submit = view.findViewById(R.id.signIp_submit);
         emailEt = view.findViewById(R.id.signUp_email);
         passwordEt = view.findViewById(R.id.signUp_password);
         confirmPasswordEt = view.findViewById(R.id.signUp_confirmPassword);
         passwordToggle = view.findViewById(R.id.signUp_passwordToggle);
         confirmPasswordToggle = view.findViewById(R.id.signUp_confirmPasswordToggle);
-
-        progressDialog = new ProgressDialog(getActivity());
-        progressDialog.setMessage("Registering User...");
+        dialog = new Dialog(view.getContext());
     }
 
     private void showOrHidePassword(EditText editText, ImageButton imageButton) {
@@ -99,8 +100,7 @@ public class SignUpFragment extends Fragment {
         if (imageButton.getDrawable().getConstantState() == ContextCompat.getDrawable(getActivity(), R.drawable.ic_eye).getConstantState()) {
             imageButton.setImageDrawable(ContextCompat.getDrawable(getActivity(), R.drawable.ic_eye_grey));
             editText.setInputType(InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
-        }
-        else {
+        } else {
             imageButton.setImageDrawable(ContextCompat.getDrawable(getActivity(), R.drawable.ic_eye));
             editText.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
         }
@@ -119,7 +119,6 @@ public class SignUpFragment extends Fragment {
             confirmPasswordEt.setError("Entered text does not matches password field");
             confirmPasswordEt.setFocusable(true);
         }
-
     }
 
     private void beginRegistration() {
@@ -142,7 +141,7 @@ public class SignUpFragment extends Fragment {
 
     private void registerUser(String email, String password) {
 
-        progressDialog.show();
+        showProgressDialog();
 
         mAuth.createUserWithEmailAndPassword(email, password)
                 .addOnCompleteListener(getActivity(), new OnCompleteListener<AuthResult>() {
@@ -150,10 +149,12 @@ public class SignUpFragment extends Fragment {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
 
+                        hideProgressDialog();
+
                         if (task.isSuccessful()) {
 
                             Log.d(TAG, "registerUser:success");
-                            progressDialog.dismiss();
+
                             FirebaseUser user = mAuth.getCurrentUser();
                             if (user != null) {
                                 Log.d(TAG, "registerUser: " + user.getUid());
@@ -164,7 +165,7 @@ public class SignUpFragment extends Fragment {
 
                         } else {
                             Log.d(TAG, "registerUser:failure", task.getException());
-                            progressDialog.dismiss();
+
                             Toast.makeText(getActivity(), "Registration Failed!", Toast.LENGTH_SHORT).show();
                         }
                     }
@@ -172,7 +173,7 @@ public class SignUpFragment extends Fragment {
             @Override
             public void onFailure(@NonNull Exception e) {
 
-                progressDialog.dismiss();
+                hideProgressDialog();
                 Toast.makeText(getActivity(), "" + e.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
@@ -210,6 +211,17 @@ public class SignUpFragment extends Fragment {
                     }
                 });
 
+    }
+
+    private void showProgressDialog() {
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.setContentView(R.layout.custom_progress_dialog);
+        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        dialog.show();
+    }
+
+    private void hideProgressDialog() {
+        dialog.dismiss();
     }
 
 }
