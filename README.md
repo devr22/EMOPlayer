@@ -1,6 +1,5 @@
 # EMOPlayer
 ![GitHub issues open](https://img.shields.io/github/issues/devr22/EMOPlayer)
-![Hactoberfest](https://camo.githubusercontent.com/d90c7a4e51b44946411cc60d39f69d7d59ce1b4a/68747470733a2f2f696d672e736869656c64732e696f2f6769746875622f6861636b746f626572666573742f323032302f736f757263652d616173662f676c61646961746f72)
 ![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)
 [![Open Source Love](https://badges.frapsoft.com/os/v1/open-source.svg?v=103)](https://github.com/ellerbrock/open-source-badges/)\
 Android App for **Emotion based Music Player.** 
